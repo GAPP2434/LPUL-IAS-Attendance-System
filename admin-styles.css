@@ -1,0 +1,199 @@
+body {
+    font-family: Arial, sans-serif;
+    background: url('images/background.png') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 80%;
+    max-width: 900px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-select {
+    background: #d799a4;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    appearance: none; 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-align: center;
+}
+
+.filter-select:focus {
+    outline: none;
+}
+
+.filter-btn {
+    background: #d799a4;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.filter-btn img.icon {
+    width: 16px; 
+    height: 16px;
+}
+
+.dropbtn {
+    background: #d799a4;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropbtn img {
+    width: 16px;
+    height: 16px;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    min-width: 150px;
+    z-index: 1;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.apply-btn:hover {
+    background: #a0125f;
+}
+
+.table-container {
+    background: lightgray;
+    padding: 20px;
+    border-radius: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid black;
+}
+
+th {
+    background: darkgray;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.info-btn {
+    background: white;
+    color: black;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons button:nth-child(2) {
+    margin-right: 20px;
+}
+
+.change-btn, .clear-btn, .export-btn, .send-btn {
+    background: teal;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.clear-btn, .export-btn, .send-btn {
+    background: gray;
+}
+
+.change-btn:hover {
+    background: #005f5f;
+}
+
+.clear-btn:hover, .export-btn:hover, .send-btn:hover {
+    background: #5a5a5a;
+}
+
+.export-btn img {
+    padding-right: 1px;
+}
+
+.admin-link {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.admin-link::after {
+    margin-left: 5px;
+}
+

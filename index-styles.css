@@ -1,0 +1,167 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+body {
+  background-image: url('images/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  max-width: 1400px;
+}
+
+/* Wrapper for title and input box */
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Title */
+.title {
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.title span{
+  font-family: 'Orbitron', sans-serif;
+  font-size: 35px;
+}
+
+/* Left Box (Input Section) */
+.input-box {
+  background: #05726e;
+  padding: 30px;
+  border-radius: 10px;
+  width: 520px;
+  text-align: center;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+  border: 10px solid black;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.input-box img {
+  width: 230px;
+  height: 230px;
+  display: block;
+  margin: 0 auto 15px;
+}
+.input-box p {
+  color: white;
+  margin-bottom: 8px;
+}
+.input-box input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  margin-bottom: 15px;
+}
+
+.time-buttons {
+  display: flex;
+  gap: 10px;
+  width: 100%;  
+  justify-content: center;
+}
+
+.time-in-btn, .time-out-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+}
+
+.time-out-btn {
+  background: #a90552;
+}
+
+.time-in-btn:hover {
+  background: #45a049;
+}
+
+.time-out-btn:hover {
+  background: #9b2929;
+}
+
+
+/* Right Box (Diamond Player Info) */
+.player-info {
+  background-color: #C296A6;
+  width: 590px;
+  height: 590px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transform: rotate(45deg);
+  color: black;
+  font-weight: bold;
+  box-shadow:
+  inset 5px 5px 100px rgba(0, 0, 0, 0.4), 
+  inset -5px -5px 100px rgba(0, 0, 0, 0.4),
+  0px 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.player-info div {
+  transform: rotate(-45deg);
+}
+
+.player-info span {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 120px;
+  text-shadow: 0 0 1px #996174, 0 0 10px #996174;
+}
+
+.player-info p {
+  margin-top: 15px;
+  font-size: 24px;
+}
+
+.player-info label {
+  font-size: 20px;
+}
+
+.player-number {
+  font-family: 'Digital Numbers', sans-serif;
+  font-size: 48px;
+  margin: 10px 0;
+  transform: rotate(-90deg);
+}
+
+/* Admin Page Link */
+.admin-link {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+.admin-link::after {
+  content: '➡';
+  margin-left: 5px;
+}

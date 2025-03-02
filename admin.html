@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <a href="index.html" class="admin-link">⬅ Main Page</a>
+
+    <div class="container">
+        <div class="filter-buttons">
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="images/filter2.png" alt="Course" class="icon"> By Course
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">Sample</a>
+                </div>
+            </div>
+        
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="images/filter2.png" alt="Year" class="icon"> By Year
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">Sample</a>
+                </div>
+            </div>
+        
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="images/filter2.png" alt="Section" class="icon"> By Section
+                </button>
+                <div class="dropdown-content">
+                    <a href="#">Sample</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-container">
+            <table id="data-table">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Year</th>
+                        <th>Section</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Computer Science</td>
+                        <td>1</td>
+                        <td>A</td>
+                        <td>John Doe</td>
+                    </tr>
+                    <tr>
+                        <td>Business</td>
+                        <td>2</td>
+                        <td>B</td>
+                        <td>Jane Smith</td>
+                    </tr>
+                    <tr>
+                        <td>Engineering</td>
+                        <td>3</td>
+                        <td>C</td>
+                        <td>Mike Johnson</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <button class="info-btn">Total: List of Total Attendees</button>
+            <div class="action-buttons">
+                <button class="export-btn">
+                    <img src="images/export.png" alt="Export" width="20" height="20">
+                </button>
+                <button class="send-btn">
+                    <img src="images/sendcert2.png" alt="Send" width="20" height="20">
+                </button>
+                <button class="change-btn">Change Status</button>
+                <button class="clear-btn">Clear Status</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
