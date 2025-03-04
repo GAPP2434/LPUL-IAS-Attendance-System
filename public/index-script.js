@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             if (data.success) {
                 document.getElementById("student-name").textContent = data.name;
-                document.getElementById("student-course").textContent = `${data.course} - Year ${data.year_level || "-"}`;
+                document.getElementById("student-course").textContent = `${data.course} - ${data.year_level || "-"}`;
 
                 // Fetch student attendance status
                 fetch("http://localhost:5000/check_attendance_status", {
