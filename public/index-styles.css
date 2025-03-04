@@ -81,29 +81,55 @@ body {
   justify-content: center;
 }
 
-.time-in-btn, .time-out-btn {
-  background: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
+button {
   width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  text-transform: uppercase;
 }
 
-.time-out-btn {
-  background: #a90552;
+#submit-btn {
+  background: linear-gradient(45deg, #0088cc, #005f99);
+  color: white;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
-.time-in-btn:hover {
-  background: #45a049;
+#submit-btn:hover {
+  background: linear-gradient(45deg, #00aaff, #0077cc);
+  transform: scale(1.05);
 }
 
-.time-out-btn:hover {
-  background: #7e053d;
+#time-in-btn {
+  background: linear-gradient(45deg, #4CAF50, #2E7D32);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
+#time-in-btn:hover {
+  background: linear-gradient(45deg, #66bb6a, #388E3C);
+  transform: scale(1.05);
+}
+
+#time-out-btn {
+  background: linear-gradient(45deg, #D32F2F, #B71C1C);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+#time-out-btn:hover {
+  background: linear-gradient(45deg, #E53935, #C62828);
+  transform: scale(1.05);
+}
+
+.hidden {
+  display: none;
+}
 
 /* Right Box (Diamond Player Info) */
 .player-info {
