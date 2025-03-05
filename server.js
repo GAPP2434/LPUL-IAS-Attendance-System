@@ -5,7 +5,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
 const multer = require("multer");
-const { PDFDocument, rgb, StandardFonts } = require("pdf-lib");
+const { PDFDocument, rgb } = require("pdf-lib");
+const fontkit = require("@pdf-lib/fontkit");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 
@@ -258,7 +259,6 @@ app.post("/clear_entry", (req, res) => {
 app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
     const pdfPath = req.file.path;
 
-    // Query to get student numbers and names with status "ATTENDED"
     const sql = `
         SELECT s.dstudentnumber, s.dname, s.demail
         FROM db_attendance.tbl_attendancestatus a
@@ -276,36 +276,37 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
             const pdfBytes = fs.readFileSync(pdfPath);
             const pdfDoc = await PDFDocument.load(pdfBytes);
 
-            // Embed the Helvetica font
-            const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
+            // Create a new PDF document for each student
             for (const student of results) {
                 const { dstudentnumber, dname, demail } = student;
 
-                // Create a new PDF for each student
                 const newPdfDoc = await PDFDocument.create();
+                // Register fontkit with the new document
+                newPdfDoc.registerFontkit(fontkit);
+
                 const [templatePage] = await newPdfDoc.copyPages(pdfDoc, [0]);
                 newPdfDoc.addPage(templatePage);
 
-                // Draw the student's name on the PDF
+                // Load and embed the font for each new document
+                const fontBytes = fs.readFileSync(path.join(__dirname, 'public/fonts/Symphony-Regular.ttf'));
+                const customFont = await newPdfDoc.embedFont(fontBytes);
+
                 const pages = newPdfDoc.getPages();
                 const firstPage = pages[0];
                 const { width, height } = firstPage.getSize();
+
                 firstPage.drawText(dname, {
-                    x: width / 2 - (dname.length * 6) - 15, // Adjust x position to center the text
+                    x: width / 2 - (dname.length * 6) - 90,
                     y: height / 2,
-                    size: 30, // Increase font size
-                    font: helveticaFont,
-                    color: rgb(0, 0, 0),
-                    align: 'center'
+                    size: 60,
+                    font: customFont,
+                    color: rgb(0, 0, 0)
                 });
 
-                // Save the new PDF
                 const newPdfBytes = await newPdfDoc.save();
                 const newPdfPath = `uploads/${dstudentnumber}.pdf`;
                 fs.writeFileSync(newPdfPath, newPdfBytes);
 
-                // Send the PDF via email
                 const mailOptions = {
                     from: process.env.EMAIL_USER,
                     to: demail,
@@ -327,7 +328,6 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
             console.error("Error processing PDF:", error);
             res.json({ success: false, message: "Error processing PDF." });
         } finally {
-            // Clean up the uploaded PDF file
             fs.unlinkSync(pdfPath);
         }
     });
