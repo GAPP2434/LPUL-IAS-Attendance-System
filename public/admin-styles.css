@@ -143,6 +143,18 @@ th {
     background: darkgray;
 }
 
+.table-container th:nth-child(5), .table-container td:nth-child(5) {
+    max-width: 200px; /* Adjust the max-width as needed */
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.table-container th:nth-child(6), .table-container td:nth-child(6) {
+    max-width: 2000px; /* Adjust the max-width as needed */
+    word-wrap: break-word;
+    white-space: normal;
+}
+
 
 .footer {
     display: flex;

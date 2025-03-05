@@ -57,6 +57,23 @@ app.post("/fetch_student", (req, res) => {
     });
 });
 
+// API Route to Fetch Log Data
+app.get("/fetch_logs", (req, res) => {
+    const sql = `
+        SELECT l.dstudentnumber, s.dname, s.dcourse, s.dyearlevel, s.demail, l.ttimestamp, l.dattendance, a.dattendancestatus
+        FROM db_attendance.tbl_logs l
+        JOIN db_attendance.tbl_students s ON l.dstudentnumber = s.dstudentnumber
+        JOIN db_attendance.tbl_attendancestatus a ON l.dstudentnumber = a.dstudentnumber
+    `;
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Query Error:", err);
+            return res.json({ success: false, message: "Database error" });
+        }
+        res.json({ success: true, logs: results });
+    });
+});
+
 // Serve index.html for all unknown routes (SPA support)
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));

@@ -13,151 +13,57 @@
         <div class="filter-buttons">
             <div class="dropdown">
                 <button class="dropbtn">
-                    <img src="images/filter2.png" alt="Course" class="icon"> By Course
+                    <img src="images/filter2.png" alt="Course" class="icon"> <span id="course-filter-text">By Course</span>
                 </button>
                 <div class="dropdown-content">
-                    <a href="#">Sample</a>
+                    <a href="#" class="course-option" data-course="">Clear Filter</a>
+                    <a href="#" class="course-option" data-course="BSIT">BSIT</a>
+                    <a href="#" class="course-option" data-course="BSCS">BSCS</a>
                 </div>
             </div>
         
             <div class="dropdown">
                 <button class="dropbtn">
-                    <img src="images/filter2.png" alt="Year" class="icon"> By Year
+                    <img src="images/filter2.png" alt="Year" class="icon"> <span id="year-filter-text">By Year</span>
                 </button>
                 <div class="dropdown-content">
-                    <a href="#">Sample</a>
+                    <a href="#" class="year-option" data-year="">Clear Filter</a>
+                    <a href="#" class="year-option" data-year="1st Year">1st Year</a>
+                    <a href="#" class="year-option" data-year="2nd Year">2nd Year</a>
+                    <a href="#" class="year-option" data-year="3rd Year">3rd Year</a>
                 </div>
             </div>
         
             <div class="dropdown">
                 <button class="dropbtn">
-                    <img src="images/filter2.png" alt="Status" class="icon"> By Status
+                    <img src="images/filter2.png" alt="Status" class="icon"> <span id="status-filter-text">By Status</span>
                 </button>
                 <div class="dropdown-content">
-                    <a href="#">Sample</a>
+                    <a href="#" class="status-option" data-status="">Clear Filter</a>
+                    <a href="#" class="status-option" data-status="ABSENT">ABSENT</a>
+                    <a href="#" class="status-option" data-status="ONGOING">ONGOING</a>
+                    <a href="#" class="status-option" data-status="ATTENDED">ATTENDED</a>
                 </div>
             </div>
         </div>
         
+        <!-- Table for Logs -->
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
+                        <th>Student Number</th>
+                        <th>Name</th>
                         <th>Course</th>
                         <th>Year</th>
-                        <th>Section</th>
-                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Time</th>
+                        <th>Remarks</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Computer Science</td>
-                        <td>1</td>
-                        <td>A</td>
-                        <td>John Doe</td>
-                    </tr>
-                    <tr>
-                        <td>Business</td>
-                        <td>2</td>
-                        <td>B</td>
-                        <td>Jane Smith</td>
-                    </tr>
-                    <tr>
-                        <td>Engineering</td>
-                        <td>3</td>
-                        <td>C</td>
-                        <td>Mike Johnson</td>
-                    </tr>
-                    <tr>
-                        <td>Computer Science</td>
-                        <td>1</td>
-                        <td>A</td>
-                        <td>John Doe</td>
-                    </tr>
-                    <tr>
-                        <td>Business</td>
-                        <td>2</td>
-                        <td>B</td>
-                        <td>Jane Smith</td>
-                    </tr>
-                    <tr>
-                        <td>Engineering</td>
-                        <td>3</td>
-                        <td>C</td>
-                        <td>Mike Johnson</td>
-                    </tr>
-                    <tr>
-                        <td>Computer Science</td>
-                        <td>1</td>
-                        <td>A</td>
-                        <td>John Doe</td>
-                    </tr>
-                    <tr>
-                        <td>Business</td>
-                        <td>2</td>
-                        <td>B</td>
-                        <td>Jane Smith</td>
-                    </tr>
-                    <tr>
-                        <td>Engineering</td>
-                        <td>3</td>
-                        <td>C</td>
-                        <td>Mike Johnson</td>
-                    </tr>
-                    <tr>
-                        <td>Computer Science</td>
-                        <td>1</td>
-                        <td>A</td>
-                        <td>John Doe</td>
-                    </tr>
-                    <tr>
-                        <td>Business</td>
-                        <td>2</td>
-                        <td>B</td>
-                        <td>Jane Smith</td>
-                    </tr>
-                    <tr>
-                        <td>Engineering</td>
-                        <td>3</td>
-                        <td>C</td>
-                        <td>Mike Johnson</td>
-                    </tr>
-                    <tr>
-                        <td>Computer Science</td>
-                        <td>1</td>
-                        <td>A</td>
-                        <td>John Doe</td>
-                    </tr>
-                    <tr>
-                        <td>Business</td>
-                        <td>2</td>
-                        <td>B</td>
-                        <td>Jane Smith</td>
-                    </tr>
-                    <tr>
-                        <td>Engineering</td>
-                        <td>3</td>
-                        <td>C</td>
-                        <td>Mike Johnson</td>
-                    </tr>
-                    <tr>
-                        <td>Computer Science</td>
-                        <td>1</td>
-                        <td>A</td>
-                        <td>John Doe</td>
-                    </tr>
-                    <tr>
-                        <td>Business</td>
-                        <td>2</td>
-                        <td>B</td>
-                        <td>Jane Smith</td>
-                    </tr>
-                    <tr>
-                        <td>Engineering</td>
-                        <td>3</td>
-                        <td>C</td>
-                        <td>Mike Johnson</td>
-                    </tr>
+                <tbody id="log-table-body">
+                    <!-- Rows will be dynamically inserted here -->
                 </tbody>
             </table>
         </div>
@@ -176,5 +82,6 @@
             </div>
         </div>
     </div>
+    <script src="admin-script.js"></script>
 </body>
 </html>
