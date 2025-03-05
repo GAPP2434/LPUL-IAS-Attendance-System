@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedCourse = null;
     let selectedYear = null;
     let selectedStatus = null;
+    const changeStatusBtn = document.getElementById("change-status");
+    const clearStatusBtn = document.getElementById("clear-status");
 
     // Fetch logs on page load
     fetch("http://localhost:5000/fetch_logs")
@@ -66,6 +68,110 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(error => console.error("Error:", error));
+
+function getPasswordInput(message, callback) {
+
+    const dialog = document.createElement("dialog");
+    dialog.style.padding = "20px";
+    dialog.style.border = "none";
+    dialog.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+    dialog.style.borderRadius = "8px";
+    dialog.style.textAlign = "center";
+    dialog.innerHTML = `
+        <p style="margin-bottom: 0px;">${message}</p>
+        <input type="password" id="passwordInput" style="width: 90%; padding: 8px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+        <br>
+        <button id="confirmBtn" style="margin-right: 10px; padding: 8px 12px; border: none; background-color: #28a745; color: white; border-radius: 5px; cursor: pointer;">Confirm</button>
+        <button id="cancelBtn" style="padding: 8px 12px; border: none; background-color: #dc3545; color: white; border-radius: 5px; cursor: pointer;">Cancel</button>
+    `;
+
+    document.body.appendChild(dialog);
+    dialog.showModal();
+
+    const passwordInput = document.getElementById("passwordInput");
+    const confirmBtn = document.getElementById("confirmBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+
+    function submitPassword() {
+        const password = passwordInput.value;
+        dialog.close();
+        document.body.removeChild(dialog);
+        callback(password);
+    }
+
+    confirmBtn.addEventListener("click", submitPassword);
+
+    passwordInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault(); 
+            submitPassword();
+        }
+    });
+
+    cancelBtn.addEventListener("click", () => {
+        dialog.close();
+        document.body.removeChild(dialog);
+        callback(null);
+    });
+
+    passwordInput.focus();
+}
+
+changeStatusBtn.addEventListener("click", () => {
+    getPasswordInput("Enter password to confirm updating attendance status to ABSENT:", (password) => {
+        if (password === null) return; 
+
+        if (password === "BSIT3-1") {
+            fetch("http://localhost:5000/change_status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Attendance status updated to ABSENT from ONGOING.");
+                } else {
+                    alert("There are no ONGOING attendance.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Something went wrong. Please try again.");
+            });
+        } else {
+            alert("Invalid password.");
+        }
+    });
+});
+
+clearStatusBtn.addEventListener("click", () => {
+    getPasswordInput("Enter password to confirm clearing all attendance records:", (password) => {
+        if (password === null) return;
+
+        if (password === "BSIT3-1") { 
+            fetch("http://localhost:5000/clear_status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("All attendance records have been successfully cleared.");
+                } else {
+                    alert("Error: Could not clear attendance status.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Something went wrong. Please try again.");
+            });
+        } else {
+            alert("Invalid password.");
+        }
+    });
+});
+
+        
 });
 
 // Combined filtering function
