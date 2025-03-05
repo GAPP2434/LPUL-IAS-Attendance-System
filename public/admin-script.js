@@ -54,6 +54,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 });
 
+                // Add event listener for export button
+                document.querySelector(".export-btn").addEventListener("click", () => {
+                    exportTableToExcel("log-table-body", selectedCourse, selectedYear, selectedStatus);
+                });
+
                 // Initial count update
                 updateTotalCount();
             } else {
@@ -95,4 +100,25 @@ function updateTotalCount() {
     }
     const attendanceText = visibleCount === 1 ? "Total: 1 Attendee" : `Total: ${visibleCount} Attendees`;
     document.getElementById("attendance").textContent = attendanceText;
+}
+
+// Function to export table data to Excel
+function exportTableToExcel(tableId, selectedCourse, selectedYear, selectedStatus) {
+    const table = document.getElementById(tableId);
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+
+    // Generate filename based on selected filters
+    let filename = "IAS-Seminar";
+    if (selectedCourse) {
+        filename += `-${selectedCourse}`;
+    }
+    if (selectedYear) {
+        filename += `-${selectedYear.replace(" ", "")}`;
+    }
+    if (selectedStatus && selectedStatus !== "ONGOING") {
+        filename += `-${selectedStatus}`;
+    }
+    filename += "-Attendance-Logs.xlsx";
+
+    XLSX.writeFile(wb, filename);
 }
