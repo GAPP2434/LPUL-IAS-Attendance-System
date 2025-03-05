@@ -11,12 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="index-styles.css">
+    <script src="index-script.js" defer></script>
 </head>
 <body>
     <a href="admin.html" class="admin-link">Admin Page</a>
 
     <div class="container">
-        <!-- Wrapper for title and input container -->
         <div class="input-wrapper">
             <div class="title">
                 <span>Squid Game: Cyber Edition –</span><br>
@@ -24,31 +24,33 @@
                 <span>Eliminated</span>
             </div>
 
-            <!-- Left Box (Input Form) -->
             <div class="input-box">
                 <img src="images/smile.png" alt="User Image">
                 <p>Student Number:</p>
-                <input type="text" placeholder="Enter your student number">
+                <input type="text" id="student-id" placeholder="Enter your student number">
+                <button id="submit-btn">Submit</button>
+
                 <div class="time-buttons">
-                    <button class="time-in-btn">Time In</button>
-                    <button class="time-out-btn">Time Out</button>
-                </div>                
+                    <button id="clear-entry" class="hidden">Clear Entry</button>
+                    <button id="time-in-btn" class="hidden">Time In</button>
+                    <button id="time-out-btn" class="hidden">Time Out</button>
+                </div>
+
             </div>
         </div>
 
-        <!-- Right Box (Diamond Player Info) -->
         <div class="player-info">
             <div>
                 <p>Player Number:</p>
-                <span>000</span>
+                <span id="player-number">000</span>
                 <p>Name:</p>
-                <label id="student-name">1</label>
+                <label id="student-name">-</label>
                 <p>Student Course/Year/Section: (e.g. BSIT 3-1)</p>
-                <label id="student-course">1</label>
+                <label id="student-course">-</label>
                 <p>Time-in:</p>
-                <label id="student-timein">1</label>
+                <label id="student-timein">-</label>
                 <p>Time-out:</p>
-                <label id="student-timeout">1</label>
+                <label id="student-timeout">-</label>
             </div>
         </div>
     </div>

@@ -42,6 +42,10 @@ body {
   font-family: 'Orbitron', sans-serif;
   font-size: 35px;
 }
+@font-face{
+  font-family: 'Symphony-Regular';
+  src: url('fonts/Symphony-Regular.ttf') format('truetype'); /* Correct the src URL */
+}
 
 /* Left Box (Input Section) */
 .input-box {
@@ -81,29 +85,81 @@ body {
   justify-content: center;
 }
 
-.time-in-btn, .time-out-btn {
-  background: #4CAF50;
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  text-transform: uppercase;
+}
+
+#submit-btn {
+  background: linear-gradient(45deg, #0088cc, #005f99);
   color: white;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+#submit-btn:hover {
+  background: linear-gradient(45deg, #00aaff, #0077cc);
+  transform: scale(1.05);
+}
+
+#time-in-btn {
+  background: linear-gradient(45deg, #4CAF50, #2E7D32);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+#time-in-btn:hover {
+  background: linear-gradient(45deg, #66bb6a, #388E3C);
+  transform: scale(1.05);
+}
+
+#time-out-btn {
+  background: linear-gradient(45deg, #D32F2F, #B71C1C);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+#time-out-btn:hover {
+  background: linear-gradient(45deg, #E53935, #C62828);
+  transform: scale(1.05);
+}
+
+#clear-entry {
+  background: linear-gradient(45deg, #f0f0f0, #d9d9d9); /* Light Gray Gradient */
+  color: #333; /* Dark gray text for readability */
   border: none;
   padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
-  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
 }
 
-.time-out-btn {
-  background: #a90552;
+#clear-entry:hover {
+  background: linear-gradient(45deg, #cfd8dc, #b0bec5); /* Subtle Blue-Gray Gradient */
+  color: #000; /* Keep text visible */
+  transform: scale(1.05);
 }
 
-.time-in-btn:hover {
-  background: #45a049;
+#clear-entry:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.time-out-btn:hover {
-  background: #7e053d;
-}
 
+
+.hidden {
+  display: none;
+}
 
 /* Right Box (Diamond Player Info) */
 .player-info {

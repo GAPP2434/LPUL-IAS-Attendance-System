@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <a href="index.html" class="admin-link">⬅ Main Page</a>
+
+    <div class="container">
+        <div class="filter-buttons">
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="images/filter2.png" alt="Course" class="icon"> <span id="course-filter-text">By Course</span>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#" class="course-option" data-course="">Clear Filter</a>
+                    <a href="#" class="course-option" data-course="BSIT">BSIT</a>
+                    <a href="#" class="course-option" data-course="BSCS">BSCS</a>
+                </div>
+            </div>
+        
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="images/filter2.png" alt="Year" class="icon"> <span id="year-filter-text">By Year</span>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#" class="year-option" data-year="">Clear Filter</a>
+                    <a href="#" class="year-option" data-year="1st Year">1st Year</a>
+                    <a href="#" class="year-option" data-year="2nd Year">2nd Year</a>
+                    <a href="#" class="year-option" data-year="3rd Year">3rd Year</a>
+                </div>
+            </div>
+        
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <img src="images/filter2.png" alt="Status" class="icon"> <span id="status-filter-text">By Status</span>
+                </button>
+                <div class="dropdown-content">
+                    <a href="#" class="status-option" data-status="">Clear Filter</a>
+                    <a href="#" class="status-option" data-status="ABSENT">ABSENT</a>
+                    <a href="#" class="status-option" data-status="ONGOING">ONGOING</a>
+                    <a href="#" class="status-option" data-status="ATTENDED">ATTENDED</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Table for Logs -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Number</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Year</th>
+                        <th>Email</th>
+                        <th>Time</th>
+                        <th>Remarks</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="log-table-body">
+                    <!-- Rows will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <div id="attendance" class="info-btn">Total: List of Total Attendees</div>
+            <div class="action-buttons">
+                <button class="export-btn">
+                    <img src="images/export.png" alt="Export" width="20" height="20">
+                </button>
+                <button class="send-btn">
+                    <img src="images/sendcert2.png" alt="Send" width="20" height="20">
+                </button>
+                <button id="change-status" class="change-btn">Change Status</button>
+                <button id="clear-status" class="clear-btn">Clear Status</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for PDF Upload -->
+    <div id="pdfModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="color: black;">Upload PDF Template</h2>
+            <input type="file" id="pdfUpload" accept="application/pdf">
+            <div id="pdfPreview" class="pdf-preview"></div>
+            <button id="uploadBtn">Upload</button>
+        </div>
+    </div>
+
+    <script src="admin-script.js"></script>
+    <script src="email-script.js"></script>
+</body>
+</html>
