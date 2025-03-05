@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="admin-styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </head>
 <body>
     <a href="index.html" class="admin-link">⬅ Main Page</a>
@@ -85,6 +84,19 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal for PDF Upload -->
+    <div id="pdfModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="color: black;">Upload PDF Template</h2>
+            <input type="file" id="pdfUpload" accept="application/pdf">
+            <div id="pdfPreview" class="pdf-preview"></div>
+            <button id="uploadBtn">Upload</button>
+        </div>
+    </div>
+
     <script src="admin-script.js"></script>
+    <script src="email-script.js"></script>
 </body>
 </html>

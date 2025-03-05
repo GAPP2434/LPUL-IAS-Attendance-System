@@ -4,6 +4,10 @@ const mysql = require("mysql2");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
+const multer = require("multer");
+const { PDFDocument, rgb, StandardFonts } = require("pdf-lib");
+const nodemailer = require("nodemailer");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -30,6 +34,18 @@ db.connect(err => {
         return;
     }
     console.log("Connected to MySQL Database!");
+});
+
+// Multer setup for file uploads
+const upload = multer({ dest: "uploads/" });
+
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
 });
 
 // API Route to Fetch Student Data
@@ -235,5 +251,84 @@ app.post("/clear_entry", (req, res) => {
         }
 
         res.json({ success: true, message: "Entry cleared successfully" });
+    });
+});
+
+// API Route to handle PDF upload and email sending
+app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
+    const pdfPath = req.file.path;
+
+    // Query to get student numbers and names with status "ATTENDED"
+    const sql = `
+        SELECT s.dstudentnumber, s.dname, s.demail
+        FROM db_attendance.tbl_attendancestatus a
+        JOIN db_attendance.tbl_students s ON a.dstudentnumber = s.dstudentnumber
+        WHERE a.dattendancestatus = 'ATTENDED'
+    `;
+
+    db.query(sql, async (err, results) => {
+        if (err) {
+            console.error("Query Error:", err);
+            return res.json({ success: false, message: "Database error" });
+        }
+
+        try {
+            const pdfBytes = fs.readFileSync(pdfPath);
+            const pdfDoc = await PDFDocument.load(pdfBytes);
+
+            // Embed the Helvetica font
+            const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+            for (const student of results) {
+                const { dstudentnumber, dname, demail } = student;
+
+                // Create a new PDF for each student
+                const newPdfDoc = await PDFDocument.create();
+                const [templatePage] = await newPdfDoc.copyPages(pdfDoc, [0]);
+                newPdfDoc.addPage(templatePage);
+
+                // Draw the student's name on the PDF
+                const pages = newPdfDoc.getPages();
+                const firstPage = pages[0];
+                const { width, height } = firstPage.getSize();
+                firstPage.drawText(dname, {
+                    x: width / 2 - (dname.length * 6) - 15, // Adjust x position to center the text
+                    y: height / 2,
+                    size: 30, // Increase font size
+                    font: helveticaFont,
+                    color: rgb(0, 0, 0),
+                    align: 'center'
+                });
+
+                // Save the new PDF
+                const newPdfBytes = await newPdfDoc.save();
+                const newPdfPath = `uploads/${dstudentnumber}.pdf`;
+                fs.writeFileSync(newPdfPath, newPdfBytes);
+
+                // Send the PDF via email
+                const mailOptions = {
+                    from: process.env.EMAIL_USER,
+                    to: demail,
+                    subject: "Your Attendance Certificate",
+                    text: `Dear ${dname},\n\nPlease find attached your attendance certificate.\n\nBest regards,\nIAS Seminar Team`,
+                    attachments: [
+                        {
+                            filename: `${dstudentnumber}.pdf`,
+                            path: newPdfPath
+                        }
+                    ]
+                };
+
+                await transporter.sendMail(mailOptions);
+            }
+
+            res.json({ success: true, message: "PDF uploaded and emails sent successfully." });
+        } catch (error) {
+            console.error("Error processing PDF:", error);
+            res.json({ success: false, message: "Error processing PDF." });
+        } finally {
+            // Clean up the uploaded PDF file
+            fs.unlinkSync(pdfPath);
+        }
     });
 });

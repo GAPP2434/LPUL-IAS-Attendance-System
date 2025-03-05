@@ -220,3 +220,57 @@ th {
     margin-left: 5px;
 }
 
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999; /* Ensure the modal appears on top of everything else */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto; /* Reduce margin to make the modal larger */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Increase width */
+    max-width: 800px; /* Increase max-width */
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.pdf-preview {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    max-height: 600px; /* Increase max-height */
+    overflow: hidden; /* Hide scroll bars */
+    position: relative; /* Ensure the text box is positioned correctly */
+}
+
+#pdfUpload {
+    color: black;
+}
+
+#uploadBtn {
+    margin-top: 20px;
+}
