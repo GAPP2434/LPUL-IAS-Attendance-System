@@ -56,7 +56,7 @@ app.post("/fetch_student", (req, res) => {
 
     // Query to fetch student details
     const studentSql = `
-        SELECT s.dname, s.dcourse, s.dyearlevel, l.dlogid AS attendance_id 
+        SELECT s.dname, s.dcourse, s.dyearlevel, COALESCE(l.dlogid, 0) AS attendance_id 
         FROM db_attendance.tbl_students s
         LEFT JOIN db_attendance.tbl_logs l ON s.dstudentnumber = l.dstudentnumber
         WHERE s.dstudentnumber = ?
@@ -71,12 +71,33 @@ app.post("/fetch_student", (req, res) => {
         if (result.length === 0) {
             return res.json({ success: false, message: "Student not found" });
         }
-
+        
         let student = result[0];
-
-        if (student.attendance_id) {
-            // Student already has an ID, return their details
-            return res.json({
+        
+        // If attendance_id is 0, it means no log entry exists, so insert one
+        if (!student.attendance_id) {
+            const insertLogSql = `
+                INSERT INTO db_attendance.tbl_logs (dstudentnumber)
+                VALUES (?)
+            `;
+        
+            db.query(insertLogSql, [student_id], (err, insertResult) => {
+                if (err) {
+                    console.error("Query Error (insertLogSql):", err);
+                    return res.json({ success: false, message: "Database error" });
+                }
+        
+                res.json({
+                    success: true,
+                    name: student.dname,
+                    course: student.dcourse,
+                    year_level: student.dyearlevel,
+                    attendance_id: insertResult.insertId // Newly created log ID
+                });
+            });
+        } else {
+            // Student already has a log entry
+            res.json({
                 success: true,
                 name: student.dname,
                 course: student.dcourse,
@@ -84,27 +105,6 @@ app.post("/fetch_student", (req, res) => {
                 attendance_id: student.attendance_id
             });
         }
-
-        // Insert a new log entry with empty ttimestamp and dattendance
-        const insertLogSql = `
-            INSERT INTO db_attendance.tbl_logs (dstudentnumber)
-            VALUES (?)
-        `;
-
-        db.query(insertLogSql, [student_id], (err, result) => {
-            if (err) {
-                console.error("Query Error (insertLogSql):", err);
-                return res.json({ success: false, message: "Database error" });
-            }
-
-            res.json({
-                success: true,
-                name: student.dname,
-                course: student.dcourse,
-                year_level: student.dyearlevel,
-                attendance_id: result.insertId // Return the newly assigned ID
-            });
-        });
     });
 });
 
@@ -193,12 +193,25 @@ app.post("/time_out", (req, res) => {
         ON DUPLICATE KEY UPDATE ttimestamp = NOW(), dattendance = 'TIME OUT'
     `;
 
+    const updateStatusSql = `
+        UPDATE db_attendance.tbl_attendancestatus
+        SET dattendancestatus = 'ATTENDED'
+        WHERE dstudentnumber = ?
+    `;
+
     db.query(sql, [student_id], (err, result) => {
         if (err) {
             console.error("Query Error:", err);
             return res.json({ success: false, message: "Database error" });
         }
-        res.json({ success: true, message: "Time out recorded" });
+        db.query(updateStatusSql, [student_id], (err, result) => {
+            if (err) {
+                console.error("Query Error (updateStatusSql):", err);
+                return res.json({ success: false, message: "Database error" });
+            }
+
+            res.json({ success: true, message: "Time out recorded and status updated to ATTENDED" });
+        });
     });
 });
 

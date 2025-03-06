@@ -35,41 +35,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(response => response.json())
                 .then(attendanceData => {
                     if (attendanceData.success) {
+                        // Hide all buttons initially
+                        timeInBtn.style.display = "none";
+                        timeOutBtn.style.display = "none";
+                        clearEntry.style.display = "none";
+                
                         if (attendanceData.status === "ABSENT") {
-                            timeOutBtn.style.display = "none";
-                            timeOutBtn.classList.remove("hidden");
-                            clearEntry.classList.remove("hidden");
-                            clearEntry.style.display = "block"; 
-                        } else {
-                            timeOutBtn.style.display = "block";
-                            timeOutBtn.classList.add("hidden");
-                            clearEntry.classList.add("hidden");
-                            clearEntry.style.display = "none"; 
-                        }
-                        if (attendanceData.status === "ONGOING") {
-                            timeInBtn.classList.remove("hidden");
-                            timeInBtn.style.display = "none";
-                        } else {
+                            // Show Time In and Clear Entry (for deletion)
                             timeInBtn.style.display = "block";
-                            timeInBtn.classList.add("hidden");
-                        }
-                        if (attendanceData.status === "ATTENDED") {
+                            clearEntry.style.display = "block";
+                            clearEntry.setAttribute("data-action", "delete"); // Mark for deletion
+                
+                        } else if (attendanceData.status === "ONGOING") {
+                            // Show Time Out and Clear Entry (for clearing only)
+                            timeOutBtn.style.display = "block";
+                            clearEntry.style.display = "block";
+                            clearEntry.setAttribute("data-action", "clear"); // Mark for clearing
+                
+                        } else if (attendanceData.status === "ATTENDED") {
                             alert("Student Already Attended!");
-                            timeInBtn.classList.remove("hidden");
-                            timeInBtn.style.display = "none";
-                            timeOutBtn.style.display = "none";
-                            timeOutBtn.classList.remove("hidden");
-
                             document.getElementById("student-name").textContent = "";
                             document.getElementById("student-course").textContent = "";
                             studentIdInput.value = "";
                             submitBtn.style.display = "block";
-
-                        } else {
-
                         }
                     }
                 });
+                
 
                 submitBtn.style.display = "none"; 
 
@@ -151,6 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     
                     timeInBtn.classList.add("hidden");
                     timeOutBtn.classList.add("hidden");
+                    clearEntry.classList.add("hidden");  // Hide the clear entry button
+                    clearEntry.style.display = "none";
                     submitBtn.style.display = "block"; // Show submit button
                 }, 1000);
             } else {
@@ -163,32 +157,43 @@ document.addEventListener("DOMContentLoaded", () => {
     // Clear Entry button click
     clearEntry.addEventListener("click", () => {
         const studentId = studentIdInput.value.trim();
-
-        fetch("http://localhost:5000/clear_entry", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ student_id: studentId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById("player-number").textContent = "";
-                document.getElementById("student-name").textContent = "";
-                document.getElementById("student-course").textContent = "";
-                studentIdInput.value = "";
-                
-                timeInBtn.classList.add("hidden");
-                timeOutBtn.classList.add("hidden");
-
-                timeInBtn.style.display = "none"; 
-                clearEntry.style.display = "none"; 
-                submitBtn.style.display = "block";
-            } else {
-                alert("Error: Could not clear entry.");
-            }
-        })
-        .catch(error => console.error("Error:", error));
+        const action = clearEntry.getAttribute("data-action"); // Check action type
+    
+        if (!studentId) {
+            alert("No student selected.");
+            return;
+        }
+    
+        if (action === "delete") {
+            // Delete entry from the database for ABSENT students
+            fetch("http://localhost:5000/clear_entry", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ student_id: studentId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Entry deleted successfully!");
+                } else {
+                    alert("Error: Could not delete entry.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        }
+    
+        // Clear input fields (Both cases)
+        document.getElementById("player-number").textContent = "";
+        document.getElementById("student-name").textContent = "";
+        document.getElementById("student-course").textContent = "";
+        studentIdInput.value = "";
+    
+        // Hide buttons and show submit button
+        timeInBtn.style.display = "none";
+        timeOutBtn.style.display = "none";
+        clearEntry.style.display = "none";
+        submitBtn.style.display = "block";
     });
-
+    
     
 });
