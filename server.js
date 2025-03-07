@@ -169,12 +169,22 @@ app.post("/fetch_student", (req, res) => {
 // API Route to Fetch Log Data
 app.get("/fetch_logs", (req, res) => {
     const sql = `
-        SELECT l.dstudentnumber, s.dname, s.dcourse, s.dyearlevel, s.demail, 
-               l.ttimein, l.ttimeout, a.dattendancestatus
-        FROM db_attendance.tbl_logs l
-        JOIN db_attendance.tbl_students s ON l.dstudentnumber = s.dstudentnumber
-        JOIN db_attendance.tbl_attendancestatus a ON l.dstudentnumber = a.dstudentnumber
+        SELECT 
+            a.ID,
+            s.dstudentnumber,
+            s.dname,
+            s.dcourse,
+            s.dyearlevel,
+            s.demail,
+            l.ttimestamp,
+            l.dattendance,
+            a.dattendancestatus
+        FROM db_attendance.tbl_attendancestatus a
+        JOIN db_attendance.tbl_students s ON a.dstudentnumber = s.dstudentnumber
+        LEFT JOIN db_attendance.tbl_logs l ON s.dstudentnumber = l.dstudentnumber
+        ORDER BY a.ID ASC
     `;
+    
     db.query(sql, (err, results) => {
         if (err) {
             console.error("Query Error:", err);
@@ -215,11 +225,12 @@ app.post("/check_attendance_status", (req, res) => {
 app.post("/time_in", (req, res) => {
     const { student_id } = req.body;
 
-    // Update the log entry with time in and attendance status
+    // Update the log entry with timestamp and attendance status
     const sql = `
         UPDATE db_attendance.tbl_logs
-        SET ttimein = NOW()
-        WHERE dstudentnumber = ? AND ttimein IS NULL
+        SET ttimestamp = NOW(),
+            dattendance = 'TIME IN'
+        WHERE dstudentnumber = ? AND dattendance IS NULL
     `;
 
     const updateStatusSql = `
@@ -249,11 +260,11 @@ app.post("/time_in", (req, res) => {
 app.post("/time_out", (req, res) => {
     const { student_id } = req.body;
     
-    // Update existing log entry with timeout
-    const sql = `
-        UPDATE db_attendance.tbl_logs 
-        SET ttimeout = NOW()
-        WHERE dstudentnumber = ? AND ttimein IS NOT NULL AND ttimeout IS NULL
+    // Insert a new log entry for time out
+    const insertSql = `
+        INSERT INTO db_attendance.tbl_logs 
+        (dstudentnumber, ttimestamp, dattendance)
+        VALUES (?, NOW(), 'TIME OUT')
     `;
 
     const updateStatusSql = `
@@ -262,7 +273,7 @@ app.post("/time_out", (req, res) => {
         WHERE dstudentnumber = ?
     `;
 
-    db.query(sql, [student_id], (err, result) => {
+    db.query(insertSql, [student_id], (err, result) => {
         if (err) {
             console.error("Query Error:", err);
             return res.json({ success: false, message: "Database error" });

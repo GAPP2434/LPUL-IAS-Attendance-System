@@ -28,17 +28,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 // Fetch student attendance status and time data
                 fetch(`http://localhost:5000/fetch_logs`)
-                    .then(response => response.json())
-                    .then(logsData => {
-                        if (logsData.success) {
-                            // Find the student's log entry
-                            const studentLog = logsData.logs.find(log => log.dstudentnumber === studentId);
-                            if (studentLog) {
-                                // Update time labels with database values
-                                document.getElementById("student-timein").textContent = studentLog.ttimein || '-';
-                                document.getElementById("student-timeout").textContent = studentLog.ttimeout || '-';
-                            }
-                        }
+                .then(response => response.json())
+                .then(logsData => {
+                    if (logsData.success) {
+                        // Find the time in and time out entries for this student
+                        const timeInLog = logsData.logs.find(log => 
+                            log.dstudentnumber === studentId && 
+                            log.dattendance === 'TIME IN'
+                        );
+                        const timeOutLog = logsData.logs.find(log => 
+                            log.dstudentnumber === studentId && 
+                            log.dattendance === 'TIME OUT'
+                        );
+
+                        // Update time labels with database values
+                        document.getElementById("student-timein").textContent = 
+                            timeInLog ? timeInLog.ttimestamp : '-';
+                        document.getElementById("student-timeout").textContent = 
+                            timeOutLog ? timeOutLog.ttimestamp : '-';
+                    }
         
                         // Continue with attendance status check
                         fetch("http://localhost:5000/check_attendance_status", {

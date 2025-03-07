@@ -11,17 +11,50 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             if (data.success) {
                 const tableBody = document.getElementById("log-table-body");
+                // Create a map to store the latest data for each student
+                const studentMap = new Map();
+
+                // Process all logs to get time in/out for each student
                 data.logs.forEach(log => {
+                    if (!studentMap.has(log.dstudentnumber)) {
+                        studentMap.set(log.dstudentnumber, {
+                            id: log.ID,
+                            studentNumber: log.dstudentnumber,
+                            name: log.dname,
+                            course: log.dcourse,
+                            year: log.dyearlevel,
+                            email: log.demail,
+                            timeIn: null,
+                            timeOut: null,
+                            status: log.dattendancestatus
+                        });
+                    }
+                    
+                    // Update time in/out based on attendance type
+                    const student = studentMap.get(log.dstudentnumber);
+                    if (log.dattendance === 'TIME IN') {
+                        student.timeIn = log.ttimestamp;
+                    } else if (log.dattendance === 'TIME OUT') {
+                        student.timeOut = log.ttimestamp;
+                    }
+                });
+
+                // Clear existing table content
+                tableBody.innerHTML = '';
+
+                // Add rows for each student
+                studentMap.forEach(student => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td>${log.dstudentnumber}</td>
-                        <td>${log.dname}</td>
-                        <td>${log.dcourse}</td>
-                        <td>${log.dyearlevel}</td>
-                        <td>${log.demail}</td>
-                        <td>${log.ttimein || '-'}</td>
-                        <td>${log.ttimeout || '-'}</td>
-                        <td>${log.dattendancestatus}</td>
+                        <td>${student.id || '-'}</td>
+                        <td>${student.studentNumber}</td>
+                        <td>${student.name}</td>
+                        <td>${student.course}</td>
+                        <td>${student.year}</td>
+                        <td>${student.email}</td>
+                        <td>${student.timeIn || '-'}</td>
+                        <td>${student.timeOut || '-'}</td>
+                        <td>${student.status}</td>
                     `;
                     tableBody.appendChild(row);
                 });
@@ -178,13 +211,16 @@ clearStatusBtn.addEventListener("click", () => {
 function filterTable(selectedCourse, selectedYear, selectedStatus) {
     const tableBody = document.getElementById("log-table-body");
     const rows = tableBody.getElementsByTagName("tr");
+    
     for (let i = 0; i < rows.length; i++) {
-        const courseCell = rows[i].getElementsByTagName("td")[2];
-        const yearCell = rows[i].getElementsByTagName("td")[3];
-        const statusCell = rows[i].getElementsByTagName("td")[7];
+        const courseCell = rows[i].getElementsByTagName("td")[3]; // Course is in 4th column
+        const yearCell = rows[i].getElementsByTagName("td")[4];   // Year is in 5th column
+        const statusCell = rows[i].getElementsByTagName("td")[8]; // Status is in 9th column
+        
         let courseMatch = !selectedCourse || (courseCell && courseCell.textContent === selectedCourse);
         let yearMatch = !selectedYear || (yearCell && yearCell.textContent.toLowerCase() === selectedYear.toLowerCase());
         let statusMatch = !selectedStatus || (statusCell && statusCell.textContent === selectedStatus);
+        
         if (courseMatch && yearMatch && statusMatch) {
             rows[i].style.display = "";
         } else {
@@ -221,7 +257,7 @@ function exportTableToExcel(tableId, selectedCourse, selectedYear, selectedStatu
     if (selectedYear) {
         filename += `-${selectedYear.replace(" ", "")}`;
     }
-    if (selectedStatus && selectedStatus !== "ONGOING") {
+    if (selectedStatus) {
         filename += `-${selectedStatus}`;
     }
     filename += "-Attendance-Logs.xlsx";
