@@ -19,8 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         <td>${log.dcourse}</td>
                         <td>${log.dyearlevel}</td>
                         <td>${log.demail}</td>
-                        <td>${log.ttimestamp}</td>
-                        <td>${log.dattendance}</td>
+                        <td>${log.ttimein || '-'}</td>
+                        <td>${log.ttimeout || '-'}</td>
                         <td>${log.dattendancestatus}</td>
                     `;
                     tableBody.appendChild(row);
