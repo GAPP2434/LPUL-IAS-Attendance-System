@@ -25,46 +25,57 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("student-name").textContent = data.name;
                 document.getElementById("student-course").textContent = `${data.course} - ${data.year_level || "-"}`;
                 document.getElementById("player-number").textContent = String(data.attendance_id).padStart(3, '0');
-
-                // Fetch student attendance status
-                fetch("http://localhost:5000/check_attendance_status", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ student_id: studentId })
-                })
-                .then(response => response.json())
-                .then(attendanceData => {
-                    if (attendanceData.success) {
-                        // Hide all buttons initially
-                        timeInBtn.style.display = "none";
-                        timeOutBtn.style.display = "none";
-                        clearEntry.style.display = "none";
                 
-                        if (attendanceData.status === "ABSENT") {
-                            // Show Time In and Clear Entry (for deletion)
-                            timeInBtn.style.display = "block";
-                            clearEntry.style.display = "block";
-                            clearEntry.setAttribute("data-action", "delete"); // Mark for deletion
-                
-                        } else if (attendanceData.status === "ONGOING") {
-                            // Show Time Out and Clear Entry (for clearing only)
-                            timeOutBtn.style.display = "block";
-                            clearEntry.style.display = "block";
-                            clearEntry.setAttribute("data-action", "clear"); // Mark for clearing
-                
-                        } else if (attendanceData.status === "ATTENDED") {
-                            alert("Student Already Attended!");
-                            document.getElementById("student-name").textContent = "";
-                            document.getElementById("student-course").textContent = "";
-                            studentIdInput.value = "";
-                            submitBtn.style.display = "block";
+                // Fetch student attendance status and time data
+                fetch(`http://localhost:5000/fetch_logs`)
+                    .then(response => response.json())
+                    .then(logsData => {
+                        if (logsData.success) {
+                            // Find the student's log entry
+                            const studentLog = logsData.logs.find(log => log.dstudentnumber === studentId);
+                            if (studentLog) {
+                                // Update time labels with database values
+                                document.getElementById("student-timein").textContent = studentLog.ttimein || '-';
+                                document.getElementById("student-timeout").textContent = studentLog.ttimeout || '-';
+                            }
                         }
-                    }
-                });
-                
-
-                submitBtn.style.display = "none"; 
-
+        
+                        // Continue with attendance status check
+                        fetch("http://localhost:5000/check_attendance_status", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ student_id: studentId })
+                        })
+                        .then(response => response.json())
+                        .then(attendanceData => {
+                            if (attendanceData.success) {
+                                // Hide all buttons initially
+                                timeInBtn.style.display = "none";
+                                timeOutBtn.style.display = "none";
+                                clearEntry.style.display = "none";
+        
+                                if (attendanceData.status === "ABSENT") {
+                                    submitBtn.style.display = "none";
+                                    timeInBtn.style.display = "block";
+                                    clearEntry.style.display = "block";
+                                    clearEntry.setAttribute("data-action", "delete");
+                                } else if (attendanceData.status === "ONGOING") {
+                                    submitBtn.style.display = "none";
+                                    timeOutBtn.style.display = "block";
+                                    clearEntry.style.display = "block";
+                                    clearEntry.setAttribute("data-action", "clear");
+                                } else if (attendanceData.status === "ATTENDED") {
+                                    alert("Student Already Attended!");
+                                    document.getElementById("student-name").textContent = "";
+                                    document.getElementById("student-course").textContent = "";
+                                    document.getElementById("student-timein").textContent = "-";
+                                    document.getElementById("student-timeout").textContent = "-";
+                                    studentIdInput.value = "";
+                                    submitBtn.style.display = "block";
+                                }
+                            }
+                        });
+                    });
             } else {
                 alert(data.message || "Student not found!");
             }
@@ -90,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Time In Button Click
     timeInBtn.addEventListener("click", () => {
         const studentId = studentIdInput.value.trim();
-
+    
         fetch("http://localhost:5000/time_in", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -99,31 +110,39 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Update the time-in label with current time
+                const now = new Date();
+                const timeString = now.toLocaleTimeString();
+                document.getElementById("student-timein").textContent = timeString;
+                
                 alert("Successfully Timed In!");
                 
                 setTimeout(() => {
                     document.getElementById("player-number").textContent = "";
                     document.getElementById("student-name").textContent = "";
                     document.getElementById("student-course").textContent = "";
+                    document.getElementById("student-timein").textContent = "-";
+                    document.getElementById("student-timeout").textContent = "-";
                     studentIdInput.value = "";
-
+    
                     timeInBtn.style.display = "none";
                     timeInBtn.classList.add("hidden");
                     timeOutBtn.classList.add("hidden");
-                    submitBtn.style.display = "block"; // Show submit button
-                    clearEntry.style.display = "none"; 
-                }, 1000);
+                    submitBtn.style.display = "block";
+                    clearEntry.style.display = "none";
+                }, 3000); // Increased timeout to 3 seconds so user can see the time
             } else {
                 alert("Error: Could not update attendance.");
             }
         })
         .catch(error => console.error("Error:", error));
     });
+    
 
     // Time out Button Click
     timeOutBtn.addEventListener("click", () => {
         const studentId = studentIdInput.value.trim();
-
+    
         fetch("http://localhost:5000/time_out", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -132,21 +151,28 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Update the time-out label with current time
+                const now = new Date();
+                const timeString = now.toLocaleTimeString();
+                document.getElementById("student-timeout").textContent = timeString;
+                
                 alert("Successfully Timed Out!");
                 
                 setTimeout(() => {
                     document.getElementById("player-number").textContent = "";
                     document.getElementById("student-name").textContent = "";
                     document.getElementById("student-course").textContent = "";
+                    document.getElementById("student-timein").textContent = "-";
+                    document.getElementById("student-timeout").textContent = "-";
                     studentIdInput.value = "";
                     timeOutBtn.style.display = "none";
                     
                     timeInBtn.classList.add("hidden");
                     timeOutBtn.classList.add("hidden");
-                    clearEntry.classList.add("hidden");  // Hide the clear entry button
+                    clearEntry.classList.add("hidden");
                     clearEntry.style.display = "none";
-                    submitBtn.style.display = "block"; // Show submit button
-                }, 1000);
+                    submitBtn.style.display = "block";
+                }, 3000); // Increased timeout to 3 seconds so user can see the time
             } else {
                 alert("Error: Could not update attendance.");
             }
