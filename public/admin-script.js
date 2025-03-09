@@ -212,7 +212,27 @@ function updateTotalCount() {
 // Function to export table data to Excel
 function exportTableToExcel(tableId, selectedCourse, selectedYear, selectedStatus) {
     const table = document.getElementById(tableId);
-    const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+    const headerRow = document.querySelector("thead tr");
+    const headers = Array.from(headerRow.cells).map(cell => cell.textContent);
+    
+    // Get visible rows only
+    const visibleRows = Array.from(table.rows).filter(row => 
+        row.style.display !== "none"
+    );
+
+    // Create worksheet data with headers
+    const wsData = [headers];
+
+    // Add visible row data
+    visibleRows.forEach(row => {
+        const rowData = Array.from(row.cells).map(cell => cell.textContent);
+        wsData.push(rowData);
+    });
+
+    // Create worksheet and workbook
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
     // Generate filename based on selected filters
     let filename = "IAS-Seminar";
@@ -222,7 +242,7 @@ function exportTableToExcel(tableId, selectedCourse, selectedYear, selectedStatu
     if (selectedYear) {
         filename += `-${selectedYear.replace(" ", "")}`;
     }
-    if (selectedStatus && selectedStatus !== "ONGOING") {
+    if (selectedStatus) {
         filename += `-${selectedStatus}`;
     }
     filename += "-Attendance-Logs.xlsx";

@@ -5,6 +5,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeOutBtn = document.getElementById("time-out-btn");
     const clearEntry = document.getElementById("clear-entry");
 
+    // Add resetForm function
+    function resetForm() {
+        const fields = {
+            'player-number': '000',
+            'student-name': '-',
+            'student-course': '-',
+            'student-timein': '-',
+            'student-timeout': '-'
+        };
+        
+        // Reset all fields
+        Object.entries(fields).forEach(([id, value]) => {
+            document.getElementById(id).textContent = value;
+        });
+        
+        // Reset input and buttons
+        studentIdInput.value = '';
+        timeInBtn.style.display = 'none';
+        timeOutBtn.style.display = 'none';
+        clearEntry.style.display = 'none';
+        timeInBtn.classList.add('hidden');
+        timeOutBtn.classList.add('hidden');
+        clearEntry.classList.add('hidden');
+        submitBtn.style.display = 'block';
+    }
+
     // Fetch student info on submit
     submitBtn.addEventListener("click", () => {
         const studentId = studentIdInput.value.trim();
@@ -133,21 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 
                 alert("Successfully Timed In!");
-                
-                setTimeout(() => {
-                    document.getElementById("player-number").textContent = "000";
-                    document.getElementById("student-name").textContent = "-";
-                    document.getElementById("student-course").textContent = "-";
-                    document.getElementById("student-timein").textContent = "-";
-                    document.getElementById("student-timeout").textContent = "-";
-                    studentIdInput.value = "";
-
-                    timeInBtn.style.display = "none";
-                    timeInBtn.classList.add("hidden");
-                    timeOutBtn.classList.add("hidden");
-                    submitBtn.style.display = "block";
-                    clearEntry.style.display = "none";
-                }, 2000);
+                setTimeout(resetForm, 2000);
             } else {
                 alert("Error: Could not update attendance.");
             }
@@ -182,22 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 
                 alert("Successfully Timed Out!");
-                
-                setTimeout(() => {
-                    document.getElementById("player-number").textContent = "000";
-                    document.getElementById("student-name").textContent = "-";
-                    document.getElementById("student-course").textContent = "-";
-                    document.getElementById("student-timein").textContent = "-";
-                    document.getElementById("student-timeout").textContent = "-";
-                    studentIdInput.value = "";
-                    
-                    timeOutBtn.style.display = "none";
-                    timeInBtn.classList.add("hidden");
-                    timeOutBtn.classList.add("hidden");
-                    clearEntry.classList.add("hidden");
-                    clearEntry.style.display = "none";
-                    submitBtn.style.display = "block";
-                }, 2000);
+                setTimeout(resetForm, 2000);
             } else {
                 alert("Error: Could not update attendance.");
             }
@@ -226,25 +223,17 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 if (data.success) {
                     alert("Entry deleted successfully!");
+                    setTimeout(resetForm, 2000);
                 } else {
                     alert("Error: Could not delete entry.");
                 }
             })
             .catch(error => console.error("Error:", error));
         }
-    
-        // Clear input fields (Both cases)
-        document.getElementById("player-number").textContent = "";
-        document.getElementById("student-name").textContent = "";
-        document.getElementById("student-course").textContent = "";
-        studentIdInput.value = "";
-    
         // Hide buttons and show submit button
         timeInBtn.style.display = "none";
         timeOutBtn.style.display = "none";
         clearEntry.style.display = "none";
         submitBtn.style.display = "block";
-    });
-    
-    
+    }); 
 });
