@@ -28,17 +28,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 // Fetch student attendance status and time data
                 fetch(`http://localhost:5000/fetch_logs`)
-                    .then(response => response.json())
-                    .then(logsData => {
-                        if (logsData.success) {
-                            // Find the student's log entry
-                            const studentLog = logsData.logs.find(log => log.dstudentnumber === studentId);
-                            if (studentLog) {
-                                // Update time labels with database values
-                                document.getElementById("student-timein").textContent = studentLog.ttimein || '-';
-                                document.getElementById("student-timeout").textContent = studentLog.ttimeout || '-';
-                            }
-                        }
+                .then(response => response.json())
+                .then(logsData => {
+                    if (logsData.success) {
+                        // Find the matching log entries for this student
+                        const timeInLog = logsData.logs.find(log => 
+                            log.dstudentnumber === studentId && 
+                            log.ttimein !== null
+                        );
+                        const timeOutLog = logsData.logs.find(log => 
+                            log.dstudentnumber === studentId && 
+                            log.ttimeout !== null
+                        );
+
+                        // Display the timestamps from database
+                        document.getElementById("student-timein").textContent = 
+                            timeInLog ? timeInLog.ttimein : '-';
+                        document.getElementById("student-timeout").textContent = 
+                            timeOutLog ? timeOutLog.ttimeout : '-';
+                    }
         
                         // Continue with attendance status check
                         fetch("http://localhost:5000/check_attendance_status", {
@@ -101,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Time In Button Click
     timeInBtn.addEventListener("click", () => {
         const studentId = studentIdInput.value.trim();
-    
+
         fetch("http://localhost:5000/time_in", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -110,39 +118,47 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update the time-in label with current time
-                const now = new Date();
-                const timeString = now.toLocaleTimeString();
-                document.getElementById("student-timein").textContent = timeString;
+                // Fetch the latest timestamp from database
+                fetch(`http://localhost:5000/fetch_logs`)
+                    .then(response => response.json())
+                    .then(logsData => {
+                        if (logsData.success) {
+                            const timeInLog = logsData.logs.find(log => 
+                                log.dstudentnumber === studentId && 
+                                log.ttimein !== null
+                            );
+                            document.getElementById("student-timein").textContent = 
+                                timeInLog ? timeInLog.ttimein : '-';
+                        }
+                    });
                 
                 alert("Successfully Timed In!");
                 
                 setTimeout(() => {
-                    document.getElementById("player-number").textContent = "";
-                    document.getElementById("student-name").textContent = "";
-                    document.getElementById("student-course").textContent = "";
+                    document.getElementById("player-number").textContent = "000";
+                    document.getElementById("student-name").textContent = "-";
+                    document.getElementById("student-course").textContent = "-";
                     document.getElementById("student-timein").textContent = "-";
                     document.getElementById("student-timeout").textContent = "-";
                     studentIdInput.value = "";
-    
+
                     timeInBtn.style.display = "none";
                     timeInBtn.classList.add("hidden");
                     timeOutBtn.classList.add("hidden");
                     submitBtn.style.display = "block";
                     clearEntry.style.display = "none";
-                }, 3000); // Increased timeout to 3 seconds so user can see the time
+                }, 2000);
             } else {
                 alert("Error: Could not update attendance.");
             }
         })
         .catch(error => console.error("Error:", error));
     });
-    
 
-    // Time out Button Click
+    // Time Out Button Click
     timeOutBtn.addEventListener("click", () => {
         const studentId = studentIdInput.value.trim();
-    
+
         fetch("http://localhost:5000/time_out", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -151,28 +167,37 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Update the time-out label with current time
-                const now = new Date();
-                const timeString = now.toLocaleTimeString();
-                document.getElementById("student-timeout").textContent = timeString;
+                // Fetch the latest timestamp from database
+                fetch(`http://localhost:5000/fetch_logs`)
+                    .then(response => response.json())
+                    .then(logsData => {
+                        if (logsData.success) {
+                            const timeOutLog = logsData.logs.find(log => 
+                                log.dstudentnumber === studentId && 
+                                log.ttimeout !== null
+                            );
+                            document.getElementById("student-timeout").textContent = 
+                                timeOutLog ? timeOutLog.ttimeout : '-';
+                        }
+                    });
                 
                 alert("Successfully Timed Out!");
                 
                 setTimeout(() => {
-                    document.getElementById("player-number").textContent = "";
-                    document.getElementById("student-name").textContent = "";
-                    document.getElementById("student-course").textContent = "";
+                    document.getElementById("player-number").textContent = "000";
+                    document.getElementById("student-name").textContent = "-";
+                    document.getElementById("student-course").textContent = "-";
                     document.getElementById("student-timein").textContent = "-";
                     document.getElementById("student-timeout").textContent = "-";
                     studentIdInput.value = "";
-                    timeOutBtn.style.display = "none";
                     
+                    timeOutBtn.style.display = "none";
                     timeInBtn.classList.add("hidden");
                     timeOutBtn.classList.add("hidden");
                     clearEntry.classList.add("hidden");
                     clearEntry.style.display = "none";
                     submitBtn.style.display = "block";
-                }, 3000); // Increased timeout to 3 seconds so user can see the time
+                }, 2000);
             } else {
                 alert("Error: Could not update attendance.");
             }

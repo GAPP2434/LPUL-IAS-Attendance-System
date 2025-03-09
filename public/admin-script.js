@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.logs.forEach(log => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
+                        <td>${log.ID || '-'}</td>
                         <td>${log.dstudentnumber}</td>
                         <td>${log.dname}</td>
                         <td>${log.dcourse}</td>
@@ -179,9 +180,9 @@ function filterTable(selectedCourse, selectedYear, selectedStatus) {
     const tableBody = document.getElementById("log-table-body");
     const rows = tableBody.getElementsByTagName("tr");
     for (let i = 0; i < rows.length; i++) {
-        const courseCell = rows[i].getElementsByTagName("td")[2];
-        const yearCell = rows[i].getElementsByTagName("td")[3];
-        const statusCell = rows[i].getElementsByTagName("td")[7];
+        const courseCell = rows[i].getElementsByTagName("td")[3];  // Course is now in 4th column
+        const yearCell = rows[i].getElementsByTagName("td")[4];    // Year is now in 5th column
+        const statusCell = rows[i].getElementsByTagName("td")[8];  // Status is now in 9th column
         let courseMatch = !selectedCourse || (courseCell && courseCell.textContent === selectedCourse);
         let yearMatch = !selectedYear || (yearCell && yearCell.textContent.toLowerCase() === selectedYear.toLowerCase());
         let statusMatch = !selectedStatus || (statusCell && statusCell.textContent === selectedStatus);

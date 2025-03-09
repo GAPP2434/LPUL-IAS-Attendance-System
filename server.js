@@ -23,10 +23,11 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // MySQL Database Connection
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "yourpassword",
-    database: process.env.DB_NAME || "yourdatabase"
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    multipleStatements: true
 });
 
 db.connect(err => {
@@ -168,19 +169,35 @@ app.post("/fetch_student", (req, res) => {
 
 // API Route to Fetch Log Data
 app.get("/fetch_logs", (req, res) => {
-    const sql = `
-        SELECT l.dstudentnumber, s.dname, s.dcourse, s.dyearlevel, s.demail, 
-               l.ttimein, l.ttimeout, a.dattendancestatus
-        FROM db_attendance.tbl_logs l
-        JOIN db_attendance.tbl_students s ON l.dstudentnumber = s.dstudentnumber
-        JOIN db_attendance.tbl_attendancestatus a ON l.dstudentnumber = a.dstudentnumber
-    `;
-    db.query(sql, (err, results) => {
+    db.query("SET time_zone = '+08:00'", (err) => {
         if (err) {
-            console.error("Query Error:", err);
+            console.error("Error setting timezone:", err);
             return res.json({ success: false, message: "Database error" });
         }
-        res.json({ success: true, logs: results });
+
+        const sql = `
+            SELECT 
+                a.ID, 
+                l.dstudentnumber, 
+                s.dname, 
+                s.dcourse, 
+                s.dyearlevel, 
+                s.demail, 
+                DATE_FORMAT(l.ttimein, '%Y-%m-%d-%H:%i') as ttimein,
+                DATE_FORMAT(l.ttimeout, '%Y-%m-%d-%H:%i') as ttimeout,
+                a.dattendancestatus
+            FROM ${process.env.DB_NAME}.tbl_logs l
+            JOIN ${process.env.DB_NAME}.tbl_students s ON l.dstudentnumber = s.dstudentnumber
+            JOIN ${process.env.DB_NAME}.tbl_attendancestatus a ON l.dstudentnumber = a.dstudentnumber
+        `;
+
+        db.query(sql, (err, results) => {
+            if (err) {
+                console.error("Query Error:", err);
+                return res.json({ success: false, message: "Database error" });
+            }
+            res.json({ success: true, logs: results });
+        });
     });
 });
 
@@ -215,32 +232,52 @@ app.post("/check_attendance_status", (req, res) => {
 app.post("/time_in", (req, res) => {
     const { student_id } = req.body;
 
-    // Update the log entry with time in and attendance status
-    const sql = `
-        UPDATE db_attendance.tbl_logs
-        SET ttimein = NOW()
-        WHERE dstudentnumber = ? AND ttimein IS NULL
+    const findLogSql = `
+        SELECT dlogid 
+        FROM db_attendance.tbl_logs 
+        WHERE dstudentnumber = ? 
+        ORDER BY dlogid DESC 
+        LIMIT 1
     `;
 
-    const updateStatusSql = `
-        UPDATE db_attendance.tbl_attendancestatus
-        SET dattendancestatus = 'ONGOING'
-        WHERE dstudentnumber = ?
-    `;
-
-    db.query(sql, [student_id], (err, result) => {
+    db.query(findLogSql, [student_id], (err, logResult) => {
         if (err) {
-            console.error("Query Error (time_in):", err);
+            console.error("Query Error (findLogSql):", err);
             return res.json({ success: false, message: "Database error" });
         }
 
-        db.query(updateStatusSql, [student_id], (err, result) => {
+        if (logResult.length === 0) {
+            return res.json({ success: false, message: "No log entry found" });
+        }
+
+        // Update the time in SQL to use SET time_zone
+        const sql = `
+            SET time_zone = '+08:00';
+            UPDATE db_attendance.tbl_logs
+            SET ttimein = NOW()
+            WHERE dlogid = ?;
+        `;
+
+        const updateStatusSql = `
+            UPDATE db_attendance.tbl_attendancestatus
+            SET dattendancestatus = 'ONGOING'
+            WHERE dstudentnumber = ?
+        `;
+
+        db.query(sql, [logResult[0].dlogid], (err, result) => {
             if (err) {
-                console.error("Query Error (updateStatusSql):", err);
+                console.error("Query Error (time_in):", err);
                 return res.json({ success: false, message: "Database error" });
             }
 
-            res.json({ success: true, message: "Time in recorded and status updated to ONGOING" });
+            db.query(updateStatusSql, [student_id], (err, result) => {
+                if (err) {
+                    console.error("Query Error (updateStatusSql):", err);
+                    return res.json({ success: false, message: "Database error" });
+                }
+
+                res.json({ success: true, message: "Time in recorded and status updated to ONGOING" });
+            });
         });
     });
 });
@@ -249,32 +286,52 @@ app.post("/time_in", (req, res) => {
 app.post("/time_out", (req, res) => {
     const { student_id } = req.body;
     
-    // Update existing log entry with timeout
-    const sql = `
-        UPDATE db_attendance.tbl_logs 
-        SET ttimeout = NOW()
+    const findLogSql = `
+        SELECT dlogid 
+        FROM db_attendance.tbl_logs 
         WHERE dstudentnumber = ? AND ttimein IS NOT NULL AND ttimeout IS NULL
+        ORDER BY dlogid DESC 
+        LIMIT 1
     `;
 
-    const updateStatusSql = `
-        UPDATE db_attendance.tbl_attendancestatus
-        SET dattendancestatus = 'ATTENDED'
-        WHERE dstudentnumber = ?
-    `;
-
-    db.query(sql, [student_id], (err, result) => {
+    db.query(findLogSql, [student_id], (err, logResult) => {
         if (err) {
-            console.error("Query Error:", err);
+            console.error("Query Error (findLogSql):", err);
             return res.json({ success: false, message: "Database error" });
         }
-        
-        db.query(updateStatusSql, [student_id], (err, result) => {
+
+        if (logResult.length === 0) {
+            return res.json({ success: false, message: "No active log entry found" });
+        }
+
+        // Update the time out SQL to use SET time_zone
+        const sql = `
+            SET time_zone = '+08:00';
+            UPDATE db_attendance.tbl_logs
+            SET ttimeout = NOW()
+            WHERE dlogid = ?;
+        `;
+
+        const updateStatusSql = `
+            UPDATE db_attendance.tbl_attendancestatus
+            SET dattendancestatus = 'ATTENDED'
+            WHERE dstudentnumber = ?
+        `;
+
+        db.query(sql, [logResult[0].dlogid], (err, result) => {
             if (err) {
-                console.error("Query Error (updateStatusSql):", err);
+                console.error("Query Error:", err);
                 return res.json({ success: false, message: "Database error" });
             }
+            
+            db.query(updateStatusSql, [student_id], (err, result) => {
+                if (err) {
+                    console.error("Query Error (updateStatusSql):", err);
+                    return res.json({ success: false, message: "Database error" });
+                }
 
-            res.json({ success: true, message: "Time out recorded and status updated to ATTENDED" });
+                res.json({ success: true, message: "Time out recorded and status updated to ATTENDED" });
+            });
         });
     });
 });
