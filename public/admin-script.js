@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.logs.forEach(log => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td>${log.ID || '-'}</td>
+                        <td>${log.PlayerNumber || '-'}</td>
                         <td>${log.dstudentnumber}</td>
                         <td>${log.dname}</td>
                         <td>${log.dcourse}</td>

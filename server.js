@@ -155,20 +155,27 @@ app.get("/fetch_logs", (req, res) => {
         }
 
         const sql = `
-            SELECT 
-                a.ID, 
-                l.dstudentnumber, 
-                s.dname, 
-                s.dcourse, 
-                s.dyearlevel, 
-                s.demail, 
-                DATE_FORMAT(l.ttimein, '%Y-%m-%d-%H:%i') as ttimein,
-                DATE_FORMAT(l.ttimeout, '%Y-%m-%d-%H:%i') as ttimeout,
-                a.dattendancestatus
-            FROM ${process.env.DB_NAME}.tbl_logs l
-            JOIN ${process.env.DB_NAME}.tbl_students s ON l.dstudentnumber = s.dstudentnumber
-            JOIN ${process.env.DB_NAME}.tbl_attendancestatus a ON l.dstudentnumber = a.dstudentnumber
+        SELECT
+            CASE 
+                WHEN a.ID IS NULL THEN '-'
+                ELSE LPAD(a.ID, 3, '0') 
+            END AS PlayerNumber,
+            s.dstudentnumber,
+            s.dname,
+            s.dcourse,
+            s.dyearlevel,
+            s.demail,
+            DATE_FORMAT(l.ttimein, '%Y-%m-%d %H:%i') AS ttimein,
+            DATE_FORMAT(l.ttimeout, '%Y-%m-%d %H:%i') AS ttimeout,
+            COALESCE(a.dattendancestatus, 'ABSENT') AS dattendancestatus
+        FROM ${process.env.DB_NAME}.tbl_students s
+        LEFT JOIN ${process.env.DB_NAME}.tbl_logs l ON s.dstudentnumber = l.dstudentnumber
+        LEFT JOIN ${process.env.DB_NAME}.tbl_attendancestatus a ON s.dstudentnumber = a.dstudentnumber
+        ORDER BY 
+            CASE WHEN a.ID IS NULL THEN 999999 ELSE a.ID END ASC, 
+            s.dname ASC
         `;
+
 
         db.query(sql, (err, results) => {
             if (err) {

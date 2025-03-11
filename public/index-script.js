@@ -108,13 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     clearEntry.setAttribute("data-action", "clear");
                                 } else if (attendanceData.status === "ATTENDED") {
                                     alert("Student Already Attended!");
-                                    document.getElementById("student-name").textContent = "";
-                                    document.getElementById("student-course").textContent = "";
-                                    document.getElementById("student-timein").textContent = "-";
-                                    document.getElementById("student-timeout").textContent = "-";
-                                    studentIdInput.value = "";
-                                    studentIdInput.disabled = false; // Enable input field
-                                    submitBtn.style.display = "block";
+                                    setTimeout(resetForm, 500);
                                 }
                             }
                         });
