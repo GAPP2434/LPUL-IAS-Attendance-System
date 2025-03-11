@@ -51,7 +51,6 @@ const transporter = nodemailer.createTransport({
 });
 
 // Fetch Student Data
-// Fetch Student Data
 app.post("/fetch_student", (req, res) => {
     const { student_id } = req.body;
     if (!student_id) return res.json({ success: false, message: "Student ID required" });
@@ -156,20 +155,27 @@ app.get("/fetch_logs", (req, res) => {
         }
 
         const sql = `
-            SELECT 
-                a.ID, 
-                l.dstudentnumber, 
-                s.dname, 
-                s.dcourse, 
-                s.dyearlevel, 
-                s.demail, 
-                DATE_FORMAT(l.ttimein, '%Y-%m-%d-%H:%i') as ttimein,
-                DATE_FORMAT(l.ttimeout, '%Y-%m-%d-%H:%i') as ttimeout,
-                a.dattendancestatus
-            FROM ${process.env.DB_NAME}.tbl_logs l
-            JOIN ${process.env.DB_NAME}.tbl_students s ON l.dstudentnumber = s.dstudentnumber
-            JOIN ${process.env.DB_NAME}.tbl_attendancestatus a ON l.dstudentnumber = a.dstudentnumber
+        SELECT
+            CASE 
+                WHEN a.ID IS NULL THEN '-'
+                ELSE LPAD(a.ID, 3, '0') 
+            END AS PlayerNumber,
+            s.dstudentnumber,
+            s.dname,
+            s.dcourse,
+            s.dyearlevel,
+            s.demail,
+            DATE_FORMAT(l.ttimein, '%Y-%m-%d %H:%i') AS ttimein,
+            DATE_FORMAT(l.ttimeout, '%Y-%m-%d %H:%i') AS ttimeout,
+            COALESCE(a.dattendancestatus, 'ABSENT') AS dattendancestatus
+        FROM ${process.env.DB_NAME}.tbl_students s
+        LEFT JOIN ${process.env.DB_NAME}.tbl_logs l ON s.dstudentnumber = l.dstudentnumber
+        LEFT JOIN ${process.env.DB_NAME}.tbl_attendancestatus a ON s.dstudentnumber = a.dstudentnumber
+        ORDER BY 
+            CASE WHEN a.ID IS NULL THEN 999999 ELSE a.ID END ASC, 
+            s.dname ASC
         `;
+
 
         db.query(sql, (err, results) => {
             if (err) {
@@ -382,20 +388,31 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                 const [templatePage] = await newPdfDoc.copyPages(pdfDoc, [0]);
                 newPdfDoc.addPage(templatePage);
 
-                // Load and embed the font for each new document
-                const fontBytes = fs.readFileSync(path.join(__dirname, 'public/fonts/Symphony-Regular.ttf'));
+                // Load and embed the custom font
+                const fontBytes = fs.readFileSync(path.join(__dirname, 'public/fonts/SymphonyScript.ttf'));
                 const customFont = await newPdfDoc.embedFont(fontBytes);
 
                 const pages = newPdfDoc.getPages();
                 const firstPage = pages[0];
                 const { width, height } = firstPage.getSize();
 
-                firstPage.drawText(dname, {
-                    x: width / 2 - (dname.length * 6) - 90,
-                    y: height / 2,
+                // Fix specific name issue
+                let displayName = dname;
+                if (dname === "Gabriel Dominic K. Altea") {
+                    displayName = "Gabriel Dominic K. Altea";
+                }
+
+                // Calculate text width to center it
+                const textWidth = customFont.widthOfTextAtSize(displayName, 60);
+                const textX = (width - textWidth) / 2;
+
+                // Draw the centered text
+                firstPage.drawText(displayName, {
+                    x: textX,
+                    y: height / 2, // Adjust this value to move the text up or down
                     size: 60,
                     font: customFont,
-                    color: rgb(0, 0, 0)
+                    color: rgb(0, 0, 0) // Set color to black
                 });
 
                 const newPdfBytes = await newPdfDoc.save();

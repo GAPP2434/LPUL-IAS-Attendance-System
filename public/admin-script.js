@@ -4,7 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedStatus = null;
     const changeStatusBtn = document.getElementById("change-status");
     const clearStatusBtn = document.getElementById("clear-status");
+    const searchInput = document.getElementById("searchInput");
 
+    searchInput.addEventListener("input", function() {
+        const searchTerm = this.value.toLowerCase();
+        filterTableBySearch(searchTerm, selectedCourse, selectedYear, selectedStatus);
+    });
     // Fetch logs on page load
     fetch("http://localhost:5000/fetch_logs")
         .then(response => response.json())
@@ -14,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.logs.forEach(log => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td>${log.ID || '-'}</td>
+                        <td>${log.PlayerNumber || '-'}</td>
                         <td>${log.dstudentnumber}</td>
                         <td>${log.dname}</td>
                         <td>${log.dcourse}</td>
@@ -176,16 +181,17 @@ clearStatusBtn.addEventListener("click", () => {
 });
 
 // Combined filtering function
-function filterTable(selectedCourse, selectedYear, selectedStatus) {
+function filterTable(course, year, status) {
     const tableBody = document.getElementById("log-table-body");
     const rows = tableBody.getElementsByTagName("tr");
+    const searchTerm = searchInput.value.toLowerCase();
     for (let i = 0; i < rows.length; i++) {
-        const courseCell = rows[i].getElementsByTagName("td")[3];  // Course is now in 4th column
-        const yearCell = rows[i].getElementsByTagName("td")[4];    // Year is now in 5th column
-        const statusCell = rows[i].getElementsByTagName("td")[8];  // Status is now in 9th column
-        let courseMatch = !selectedCourse || (courseCell && courseCell.textContent === selectedCourse);
-        let yearMatch = !selectedYear || (yearCell && yearCell.textContent.toLowerCase() === selectedYear.toLowerCase());
-        let statusMatch = !selectedStatus || (statusCell && statusCell.textContent === selectedStatus);
+        const courseCell = rows[i].getElementsByTagName("td")[3];  // Course is in 4th column
+        const yearCell = rows[i].getElementsByTagName("td")[4];    // Year is in 5th column
+        const statusCell = rows[i].getElementsByTagName("td")[8];  // Status is in 9th column
+        let courseMatch = !course || (courseCell && courseCell.textContent === course);
+        let yearMatch = !year || (yearCell && yearCell.textContent.toLowerCase() === year.toLowerCase());
+        let statusMatch = !status || (statusCell && statusCell.textContent === status);
         if (courseMatch && yearMatch && statusMatch) {
             rows[i].style.display = "";
         } else {
@@ -193,6 +199,7 @@ function filterTable(selectedCourse, selectedYear, selectedStatus) {
         }
     }
     updateTotalCount();
+    filterTableBySearch(searchTerm, course, year, status);
 }
 
 // Function to update the total count of visible rows
@@ -214,6 +221,7 @@ function exportTableToExcel(tableId, selectedCourse, selectedYear, selectedStatu
     const table = document.getElementById(tableId);
     const headerRow = document.querySelector("thead tr");
     const headers = Array.from(headerRow.cells).map(cell => cell.textContent);
+    const searchTerm = document.getElementById("searchInput").value.trim();
     
     // Get visible rows only
     const visibleRows = Array.from(table.rows).filter(row => 
@@ -234,7 +242,7 @@ function exportTableToExcel(tableId, selectedCourse, selectedYear, selectedStatu
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
-    // Generate filename based on selected filters
+    // Generate filename based on selected filters and search term
     let filename = "IAS-Seminar";
     if (selectedCourse) {
         filename += `-${selectedCourse}`;
@@ -245,7 +253,47 @@ function exportTableToExcel(tableId, selectedCourse, selectedYear, selectedStatu
     if (selectedStatus) {
         filename += `-${selectedStatus}`;
     }
+    if (searchTerm) {
+        filename += `-Search-${searchTerm}`;
+    }
     filename += "-Attendance-Logs.xlsx";
 
     XLSX.writeFile(wb, filename);
+}
+
+
+// Function to filter table by search term and other filters
+function filterTableBySearch(searchTerm, course, year, status) {
+    const tableBody = document.getElementById("log-table-body");
+    const rows = tableBody.getElementsByTagName("tr");
+    
+    for (let i = 0; i < rows.length; i++) {
+        const studentNumberCell = rows[i].getElementsByTagName("td")[1]; // Student Number is in 2nd column
+        const nameCell = rows[i].getElementsByTagName("td")[2]; // Name is in 3rd column
+        const courseCell = rows[i].getElementsByTagName("td")[3]; // Course is in 4th column
+        const yearCell = rows[i].getElementsByTagName("td")[4]; // Year is in 5th column
+        const statusCell = rows[i].getElementsByTagName("td")[8]; // Status is in 9th column
+        
+        if (studentNumberCell && nameCell) {
+            const studentNumber = studentNumberCell.textContent.toLowerCase();
+            const name = nameCell.textContent.toLowerCase();
+            
+            // Check if text matches search and other filters
+            const searchMatch = searchTerm === '' || 
+                               studentNumber.includes(searchTerm) || 
+                               name.includes(searchTerm);
+            
+            const courseMatch = !course || (courseCell && courseCell.textContent === course);
+            const yearMatch = !year || (yearCell && yearCell.textContent.toLowerCase() === year.toLowerCase());
+            const statusMatch = !status || (statusCell && statusCell.textContent === status);
+            
+            if (searchMatch && courseMatch && yearMatch && statusMatch) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+    
+    updateTotalCount();
 }

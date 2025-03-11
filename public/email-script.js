@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btn = document.querySelector(".send-btn");
     const span = document.getElementsByClassName("close")[0];
     const uploadBtn = document.getElementById("uploadBtn");
+    const debugBtn = document.getElementById("debugBtn"); // Added Debug button
     const pdfUpload = document.getElementById("pdfUpload");
     const pdfPreview = document.getElementById("pdfPreview");
     const loadingScreen = document.getElementById("loadingScreen");
@@ -82,5 +83,21 @@ document.addEventListener("DOMContentLoaded", () => {
             loadingScreen.classList.add("hidden");
             alert("An error occurred while uploading the PDF.");
         });
+    }
+
+    // Handle Debug button click
+    debugBtn.onclick = function() {
+        fetch("http://localhost:5000/fetch_logs")
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    data.logs.forEach(log => {
+                        console.log("Retrieved Name:", log.dname);
+                    });
+                } else {
+                    alert("Failed to fetch logs for debugging.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
     }
 });
