@@ -376,41 +376,42 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
         try {
             const pdfBytes = fs.readFileSync(pdfPath);
             const pdfDoc = await PDFDocument.load(pdfBytes);
-
+    
             // Create a new PDF document for each student
             for (const student of results) {
                 const { dstudentnumber, dname, demail } = student;
-
+    
                 const newPdfDoc = await PDFDocument.create();
                 // Register fontkit with the new document
                 newPdfDoc.registerFontkit(fontkit);
-
+    
                 const [templatePage] = await newPdfDoc.copyPages(pdfDoc, [0]);
                 newPdfDoc.addPage(templatePage);
-
+    
                 // Load and embed the custom font
-                const fontBytes = fs.readFileSync(path.join(__dirname, 'public/fonts/SymphonyScript.ttf'));
+                const fontBytes = fs.readFileSync(path.join(__dirname, 'public/fonts/Tempting.ttf'));
                 const customFont = await newPdfDoc.embedFont(fontBytes);
-
+    
                 const pages = newPdfDoc.getPages();
                 const firstPage = pages[0];
                 const { width, height } = firstPage.getSize();
-
+    
                 // Fix specific name issue
                 let displayName = dname;
                 if (dname === "Gabriel Dominic K. Altea") {
                     displayName = "Gabriel Dominic K. Altea";
                 }
-
-                // Calculate text width to center it
-                const textWidth = customFont.widthOfTextAtSize(displayName, 60);
+    
+                // Updated font size to 40 and recalculated center position
+                const fontSize = 40;
+                const textWidth = customFont.widthOfTextAtSize(displayName, fontSize);
                 const textX = (width - textWidth) / 2;
-
-                // Draw the centered text
+    
+                // Draw the centered text with updated font size
                 firstPage.drawText(displayName, {
                     x: textX,
                     y: height / 2, // Adjust this value to move the text up or down
-                    size: 60,
+                    size: fontSize,
                     font: customFont,
                     color: rgb(0, 0, 0) // Set color to black
                 });
