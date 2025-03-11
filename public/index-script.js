@@ -5,6 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeOutBtn = document.getElementById("time-out-btn");
     const clearEntry = document.getElementById("clear-entry");
 
+    studentIdInput.addEventListener("input", (event) => {
+        const value = event.target.value;
+        event.target.value = value.replace(/[^0-9\-]/g, '').slice(0, 10); // Limit to 10 characters
+    });
+
     // Add resetForm function
     function resetForm() {
         const fields = {
@@ -22,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Reset input and buttons
         studentIdInput.value = '';
+        studentIdInput.disabled = false; // Enable input field
         timeInBtn.style.display = 'none';
         timeOutBtn.style.display = 'none';
         clearEntry.style.display = 'none';
@@ -39,6 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Please enter a student number.");
             return;
         }
+
+        studentIdInput.disabled = true; // Disable input field
 
         fetch("http://localhost:5000/fetch_student", {
             method: "POST",
@@ -105,16 +113,21 @@ document.addEventListener("DOMContentLoaded", () => {
                                     document.getElementById("student-timein").textContent = "-";
                                     document.getElementById("student-timeout").textContent = "-";
                                     studentIdInput.value = "";
+                                    studentIdInput.disabled = false; // Enable input field
                                     submitBtn.style.display = "block";
                                 }
                             }
                         });
                     });
             } else {
-                alert(data.message || "Student not found!");
+                alert("Student Not Found");
+                studentIdInput.disabled = false; // Enable input field
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => {
+            console.error("Error:", error);
+            studentIdInput.disabled = false; // Enable input field
+        });
     });
 
     studentIdInput.addEventListener("keypress", (event) => {
@@ -159,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 
                 alert("Successfully Timed In!");
-                setTimeout(resetForm, 2000);
+                setTimeout(resetForm, 500);
             } else {
                 alert("Error: Could not update attendance.");
             }
@@ -194,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 
                 alert("Successfully Timed Out!");
-                setTimeout(resetForm, 2000);
+                setTimeout(resetForm, 500);
             } else {
                 alert("Error: Could not update attendance.");
             }
@@ -223,17 +236,33 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 if (data.success) {
                     alert("Entry deleted successfully!");
-                    setTimeout(resetForm, 2000);
+                    setTimeout(resetForm, 500);
                 } else {
                     alert("Error: Could not delete entry.");
                 }
             })
             .catch(error => console.error("Error:", error));
         }
+        
+        // Clear player-info fields
+        const fields = {
+            'player-number': '000',
+            'student-name': '-',
+            'student-course': '-',
+            'student-timein': '-',
+            'student-timeout': '-'
+        };
+        
+        Object.entries(fields).forEach(([id, value]) => {
+            document.getElementById(id).textContent = value;
+        });
+
         // Hide buttons and show submit button
         timeInBtn.style.display = "none";
         timeOutBtn.style.display = "none";
         clearEntry.style.display = "none";
         submitBtn.style.display = "block";
+        studentIdInput.disabled = false; // Enable input field
+        studentIdInput.value = "";
     }); 
 });

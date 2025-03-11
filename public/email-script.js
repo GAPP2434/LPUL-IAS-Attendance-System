@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const uploadBtn = document.getElementById("uploadBtn");
     const pdfUpload = document.getElementById("pdfUpload");
     const pdfPreview = document.getElementById("pdfPreview");
+    const loadingScreen = document.getElementById("loadingScreen");
 
     // Open the modal
     btn.onclick = function() {
@@ -53,6 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // Show loading screen
+        loadingScreen.classList.remove("hidden");
+
         const formData = new FormData();
         formData.append("pdf", file);
 
@@ -62,6 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(response => response.json())
         .then(data => {
+            // Hide loading screen
+            loadingScreen.classList.add("hidden");
+
             if (data.success) {
                 alert("PDF uploaded and emails sent successfully.");
                 modal.style.display = "none";
@@ -71,6 +78,8 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(error => {
             console.error("Error:", error);
+            // Hide loading screen
+            loadingScreen.classList.add("hidden");
             alert("An error occurred while uploading the PDF.");
         });
     }
