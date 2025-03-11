@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    studentIdInput.addEventListener("keypress", (event) => {
+    document.addEventListener("keypress", (event) => {
         if (event.key === "Enter") {
             event.preventDefault(); // Prevent any default action
     
@@ -138,6 +138,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
+    // Add event listener to the document to detect "Delete" key press
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Delete") {
+            event.preventDefault(); // Prevent any default action
+
+            if (clearEntry.style.display === "block") {
+                // If the Clear Entry button is visible, trigger the Clear Entry function
+                clearEntry.click();
+            }
+        }
+    });
 
     // Time In Button Click
     timeInBtn.addEventListener("click", () => {
