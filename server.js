@@ -389,12 +389,18 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                 const firstPage = pages[0];
                 const { width, height } = firstPage.getSize();
 
+                // Fix specific name issue
+                let displayName = dname;
+                if (dname === "Gabriel Dominic K. Altea") {
+                    displayName = "Gabriel Dominic K. Altea";
+                }
+
                 // Calculate text width to center it
-                const textWidth = customFont.widthOfTextAtSize(dname, 60);
+                const textWidth = customFont.widthOfTextAtSize(displayName, 60);
                 const textX = (width - textWidth) / 2;
 
                 // Draw the centered text
-                firstPage.drawText(dname, {
+                firstPage.drawText(displayName, {
                     x: textX,
                     y: height / 2, // Adjust this value to move the text up or down
                     size: 60,
@@ -410,7 +416,7 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                     from: process.env.EMAIL_USER,
                     to: demail,
                     subject: "Your Attendance Certificate",
-                    text: `Dear ${dname},\n\nPlease find attached your attendance certificate.\n\nBest regards,\nIAS Seminar Team`,
+                    text: `Dear ${displayName},\n\nPlease find attached your attendance certificate.\n\nBest regards,\nIAS Seminar Team`,
                     attachments: [
                         {
                             filename: `${dstudentnumber}.pdf`,
