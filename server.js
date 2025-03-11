@@ -381,8 +381,8 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                 const [templatePage] = await newPdfDoc.copyPages(pdfDoc, [0]);
                 newPdfDoc.addPage(templatePage);
 
-                // Load and embed the font for each new document
-                const fontBytes = fs.readFileSync(path.join(__dirname, 'public/fonts/Symphony-Regular.ttf'));
+                // Load and embed the custom font
+                const fontBytes = fs.readFileSync(path.join(__dirname, 'public/fonts/SymphonyScript.ttf'));
                 const customFont = await newPdfDoc.embedFont(fontBytes);
 
                 const pages = newPdfDoc.getPages();
