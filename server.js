@@ -405,8 +405,8 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                 const mailOptions = {
                     from: process.env.EMAIL_USER,
                     to: demail,
-                    subject: "Your Attendance Certificate",
-                    text: `Dear ${dname},\n\nPlease find attached your attendance certificate.\n\nBest regards,\nIAS Seminar Team`,
+                    subject: "Certificate of Participation to the Seminar entitled “Squid Game: Cyber Edition – Don’t Let Your Data Get Eliminated”",
+                    text: `Dear ${dname},\n\nThank you for participating in todays seminar. Don't forget to answer the feedback form if you haven't already. Here is your attendance certificate and thank you again for your participation.\n\nBest regards,\nIAS Seminar Team`,
                     attachments: [
                         {
                             filename: `${dstudentnumber}.pdf`,
