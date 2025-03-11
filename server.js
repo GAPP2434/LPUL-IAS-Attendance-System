@@ -51,7 +51,6 @@ const transporter = nodemailer.createTransport({
 });
 
 // Fetch Student Data
-// Fetch Student Data
 app.post("/fetch_student", (req, res) => {
     const { student_id } = req.body;
     if (!student_id) return res.json({ success: false, message: "Student ID required" });
@@ -390,12 +389,17 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                 const firstPage = pages[0];
                 const { width, height } = firstPage.getSize();
 
+                // Calculate text width to center it
+                const textWidth = customFont.widthOfTextAtSize(dname, 60);
+                const textX = (width - textWidth) / 2;
+
+                // Draw the centered text
                 firstPage.drawText(dname, {
-                    x: width / 2 - (dname.length * 6) - 90,
-                    y: height / 2,
+                    x: textX,
+                    y: height / 2, // Adjust this value to move the text up or down
                     size: 60,
                     font: customFont,
-                    color: rgb(0, 0, 0)
+                    color: rgb(0, 0, 0) // Set color to black
                 });
 
                 const newPdfBytes = await newPdfDoc.save();
