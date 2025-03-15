@@ -221,3 +221,12 @@ button {
   content: '➡';
   margin-left: 5px;
 }
+#player-number{
+  color: green
+}
+#student-timein{
+  color: lime;
+}
+#student-timeout{
+  color: red;
+}
