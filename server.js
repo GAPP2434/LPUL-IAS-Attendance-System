@@ -269,19 +269,40 @@ app.post("/change_status", (req, res) => {
 });
 
 app.post("/clear_status", (req, res) => {
-    const sql = "UPDATE db_attendance.tbl_attendancestatus SET dattendancestatus = 'ABSENT', ID = NULL";
-
-    db.query(sql, (err, result) => {
+    // First reset all status values to ABSENT
+    const sqlStatus = "UPDATE db_attendance.tbl_attendancestatus SET dattendancestatus = 'ABSENT'";
+    
+    db.query(sqlStatus, (err, result) => {
         if (err) {
-            console.error("Query Error:", err);
+            console.error("Query Error (status reset):", err);
             return res.json({ success: false, message: "Database error" });
         }
-
-        if (result.affectedRows === 0) {
-            return res.json({ success: false, message: "No records updated. No ongoing attendance found." });
-        }
-
-        res.json({ success: true, message: `${result.affectedRows} records updated to ABSENT` });
+        
+        // Then reset all ID values to NULL
+        const sqlId = "UPDATE db_attendance.tbl_attendancestatus SET ID = NULL";
+        
+        db.query(sqlId, (err, idResult) => {
+            if (err) {
+                console.error("Query Error (ID reset):", err);
+                return res.json({ success: false, message: "Database error" });
+            }
+            
+            // Reset all time in/out values in logs table
+            const sqlLogs = "UPDATE db_attendance.tbl_logs SET ttimein = NULL, ttimeout = NULL";
+            
+            db.query(sqlLogs, (err, logsResult) => {
+                if (err) {
+                    console.error("Query Error (logs reset):", err);
+                    return res.json({ success: false, message: "Database error" });
+                }
+                
+                const totalAffected = result.affectedRows + idResult.affectedRows;
+                res.json({ 
+                    success: true, 
+                    message: `All records reset: ${totalAffected} status changes, all IDs cleared` 
+                });
+            });
+        });
     });
 });
 

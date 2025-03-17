@@ -124,8 +124,8 @@ function getPasswordInput(message, callback) {
 }
 
 changeStatusBtn.addEventListener("click", () => {
-    getPasswordInput("Enter password to confirm updating attendance status to ABSENT:", (password) => {
-        if (password === null) return; 
+    getPasswordInput("Enter password to confirm updating ONGOING status to ABSENT:", (password) => {
+        if (password === null) return; // User cancelled
 
         if (password === "BSIT3-1") {
             fetch("http://localhost:5000/change_status", {
@@ -135,9 +135,11 @@ changeStatusBtn.addEventListener("click", () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert("Attendance status updated to ABSENT from ONGOING.");
+                    alert("Attendance status updated: ONGOING → ABSENT");
+                    // Reload the page to refresh data
+                    window.location.reload();
                 } else {
-                    alert("There are no ONGOING attendance.");
+                    alert(data.message || "No ONGOING attendance records found.");
                 }
             })
             .catch(error => {
@@ -151,8 +153,8 @@ changeStatusBtn.addEventListener("click", () => {
 });
 
 clearStatusBtn.addEventListener("click", () => {
-    getPasswordInput("Enter password to confirm clearing all attendance records:", (password) => {
-        if (password === null) return;
+    getPasswordInput("Enter password to confirm COMPLETE RESET of all attendance records:", (password) => {
+        if (password === null) return; // User cancelled
 
         if (password === "BSIT3-1") { 
             fetch("http://localhost:5000/clear_status", {
@@ -162,9 +164,11 @@ clearStatusBtn.addEventListener("click", () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert("All attendance records have been successfully cleared.");
+                    alert("COMPLETE RESET: All attendance records have been reset to default state.");
+                    // Reload the page to refresh data
+                    window.location.reload();
                 } else {
-                    alert("Error: Could not clear attendance status.");
+                    alert("Error: " + (data.message || "Could not reset attendance records."));
                 }
             })
             .catch(error => {
