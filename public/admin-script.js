@@ -135,7 +135,7 @@ changeStatusBtn.addEventListener("click", () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert("Attendance status updated: ONGOING → ABSENT");
+                    alert("Attendance status updated: ONGOING → INCOMPLETE");
                     // Reload the page to refresh data
                     window.location.reload();
                 } else {

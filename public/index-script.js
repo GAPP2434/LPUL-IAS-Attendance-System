@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     timeInBtn.style.display = "block";
                                     clearEntry.style.display = "block";
                                     clearEntry.setAttribute("data-action", "delete");
-                                } else if (attendanceData.status === "ONGOING") {
+                                } else if (attendanceData.status === "ONGOING" || attendanceData.status === "INCOMPLETE") {
                                     submitBtn.style.display = "none";
                                     timeOutBtn.style.display = "block";
                                     clearEntry.style.display = "block";
@@ -188,36 +188,33 @@ document.addEventListener("DOMContentLoaded", () => {
     // Time Out Button Click
     timeOutBtn.addEventListener("click", () => {
         const studentId = studentIdInput.value.trim();
-
-        fetch("http://localhost:5000/time_out", {
+    
+        // First check the current attendance status
+        fetch("http://localhost:5000/check_attendance_status", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ student_id: studentId })
         })
         .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Fetch the latest timestamp from database
-                fetch(`http://localhost:5000/fetch_logs`)
-                    .then(response => response.json())
-                    .then(logsData => {
-                        if (logsData.success) {
-                            const timeOutLog = logsData.logs.find(log => 
-                                log.dstudentnumber === studentId && 
-                                log.ttimeout !== null
-                            );
-                            document.getElementById("student-timeout").textContent = 
-                                timeOutLog ? timeOutLog.ttimeout : '-';
-                        }
-                    });
+        .then(statusData => {
+            if (statusData.success) {
+                // If status is INCOMPLETE, show confirmation dialog
+                if (statusData.status === "INCOMPLETE") {
+                    if (!confirm("Timing out will change the status from INCOMPLETE to ATTENDED. Proceed?")) {
+                        return; // Cancel the time out if user clicks Cancel
+                    }
+                }
                 
-                alert("Successfully Timed Out!");
-                setTimeout(resetForm, 500);
+                // Proceed with time out
+                performTimeOut(studentId);
             } else {
-                alert("Error: Could not update attendance.");
+                alert("Error: Could not check attendance status.");
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => {
+            console.error("Error:", error);
+            alert("Error checking attendance status.");
+        });
     });
     
     // Clear Entry button click
@@ -270,4 +267,36 @@ document.addEventListener("DOMContentLoaded", () => {
         studentIdInput.disabled = false; // Enable input field
         studentIdInput.value = "";
     }); 
+
+    function performTimeOut(studentId) {
+        fetch("http://localhost:5000/time_out", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ student_id: studentId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Fetch the latest timestamp from database
+                fetch(`http://localhost:5000/fetch_logs`)
+                    .then(response => response.json())
+                    .then(logsData => {
+                        if (logsData.success) {
+                            const timeOutLog = logsData.logs.find(log => 
+                                log.dstudentnumber === studentId && 
+                                log.ttimeout !== null
+                            );
+                            document.getElementById("student-timeout").textContent = 
+                                timeOutLog ? timeOutLog.ttimeout : '-';
+                        }
+                    });
+                
+                alert("Successfully Timed Out!");
+                setTimeout(resetForm, 500);
+            } else {
+                alert("Error: Could not update attendance.");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
 });

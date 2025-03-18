@@ -252,7 +252,7 @@ app.post("/time_in", (req, res) => handleTimeAction(req, res, 'in'));
 app.post("/time_out", (req, res) => handleTimeAction(req, res, 'out'));
 
 app.post("/change_status", (req, res) => {
-    const sql = "UPDATE db_attendance.tbl_attendancestatus SET dattendancestatus = 'ABSENT' WHERE dattendancestatus = 'ONGOING'";
+    const sql = "UPDATE db_attendance.tbl_attendancestatus SET dattendancestatus = 'INCOMPLETE' WHERE dattendancestatus = 'ONGOING'";
 
     db.query(sql, (err, result) => {
         if (err) {
@@ -264,42 +264,41 @@ app.post("/change_status", (req, res) => {
             return res.json({ success: false, message: "No records updated. No ongoing attendance found." });
         }
 
-        res.json({ success: true, message: `${result.affectedRows} records updated to ABSENT` });
+        res.json({ success: true, message: `${result.affectedRows} records updated to INCOMPLETE` });
     });
 });
 
 app.post("/clear_status", (req, res) => {
-    // First reset all status values to ABSENT
-    const sqlStatus = "UPDATE db_attendance.tbl_attendancestatus SET dattendancestatus = 'ABSENT'";
+    // Delete all entries from logs table
+    const deleteLogsSql = `DELETE FROM db_attendance.tbl_logs`;
     
-    db.query(sqlStatus, (err, result) => {
+    db.query(deleteLogsSql, (err, deleteResult) => {
         if (err) {
-            console.error("Query Error (status reset):", err);
+            console.error("Query Error (logs delete):", err);
             return res.json({ success: false, message: "Database error" });
         }
         
-        // Then reset all ID values to NULL
-        const sqlId = "UPDATE db_attendance.tbl_attendancestatus SET ID = NULL";
+        // Reset all ID values to NULL
+        const clearIdsSql = `UPDATE db_attendance.tbl_attendancestatus SET ID = NULL`;
         
-        db.query(sqlId, (err, idResult) => {
+        db.query(clearIdsSql, (err, clearResult) => {
             if (err) {
                 console.error("Query Error (ID reset):", err);
                 return res.json({ success: false, message: "Database error" });
             }
             
-            // Reset all time in/out values in logs table
-            const sqlLogs = "UPDATE db_attendance.tbl_logs SET ttimein = NULL, ttimeout = NULL";
+            // Reset attendance status to ABSENT
+            const resetStatusSql = `UPDATE db_attendance.tbl_attendancestatus SET dattendancestatus = 'ABSENT'`;
             
-            db.query(sqlLogs, (err, logsResult) => {
+            db.query(resetStatusSql, (err, statusResult) => {
                 if (err) {
-                    console.error("Query Error (logs reset):", err);
+                    console.error("Query Error (status reset):", err);
                     return res.json({ success: false, message: "Database error" });
                 }
                 
-                const totalAffected = result.affectedRows + idResult.affectedRows;
                 res.json({ 
                     success: true, 
-                    message: `All records reset: ${totalAffected} status changes, all IDs cleared` 
+                    message: `Complete reset: All logs deleted, IDs cleared, and status set to ABSENT` 
                 });
             });
         });
@@ -313,66 +312,87 @@ app.post("/clear_entry", (req, res) => {
         return res.json({ success: false, message: "Student ID is required" });
     }
 
-    // Get the current ID of the entry to be deleted
-    const getCurrentIdSql = `
-        SELECT ID 
-        FROM db_attendance.tbl_attendancestatus 
+    // Check if student has timed in
+    const checkTimeInSql = `
+        SELECT ttimein 
+        FROM db_attendance.tbl_logs 
         WHERE dstudentnumber = ?
+        ORDER BY dlogid DESC LIMIT 1
     `;
 
-    db.query(getCurrentIdSql, [student_id], (err, result) => {
+    db.query(checkTimeInSql, [student_id], (err, timeResult) => {
         if (err) {
-            console.error("Query Error (getCurrentIdSql):", err);
+            console.error("Query Error (checkTimeInSql):", err);
             return res.json({ success: false, message: "Database error" });
         }
 
-        if (result.length > 0) {
-            const currentId = result[0].ID;
-
-            // Delete the log entry
-            const deleteLogSql = `
-                DELETE FROM db_attendance.tbl_logs 
-                WHERE dstudentnumber = ? AND ttimein IS NULL
+        // If no time in value, or no record found, delete entry
+        if (timeResult.length === 0 || timeResult[0].ttimein === null) {
+            // Get the current ID of the entry
+            const getCurrentIdSql = `
+                SELECT ID 
+                FROM db_attendance.tbl_attendancestatus 
+                WHERE dstudentnumber = ?
             `;
 
-            db.query(deleteLogSql, [student_id], (err, deleteResult) => {
+            db.query(getCurrentIdSql, [student_id], (err, result) => {
                 if (err) {
-                    console.error("Query Error (deleteLogSql):", err);
+                    console.error("Query Error (getCurrentIdSql):", err);
                     return res.json({ success: false, message: "Database error" });
                 }
 
-                // Clear the ID for the current student
-                const clearIdSql = `
-                    UPDATE db_attendance.tbl_attendancestatus
-                    SET ID = NULL
-                    WHERE dstudentnumber = ?
-                `;
+                if (result.length > 0 && result[0].ID !== null) {
+                    const currentId = result[0].ID;
 
-                db.query(clearIdSql, [student_id], (err, clearResult) => {
-                    if (err) {
-                        console.error("Query Error (clearIdSql):", err);
-                        return res.json({ success: false, message: "Database error" });
-                    }
-
-                    // Decrement all higher IDs
-                    const decrementIdsSql = `
-                        UPDATE db_attendance.tbl_attendancestatus
-                        SET ID = ID - 1
-                        WHERE ID > ?
+                    // Delete entries from logs table
+                    const deleteLogSql = `
+                        DELETE FROM db_attendance.tbl_logs
+                        WHERE dstudentnumber = ?
                     `;
 
-                    db.query(decrementIdsSql, [currentId], (err, decrementResult) => {
+                    db.query(deleteLogSql, [student_id], (err, deleteResult) => {
                         if (err) {
-                            console.error("Query Error (decrementIdsSql):", err);
+                            console.error("Query Error (deleteLogSql):", err);
                             return res.json({ success: false, message: "Database error" });
                         }
 
-                        res.json({ success: true, message: "Entry cleared and IDs updated successfully" });
+                        // Clear the ID for the current student
+                        const clearIdSql = `
+                            UPDATE db_attendance.tbl_attendancestatus
+                            SET ID = NULL
+                            WHERE dstudentnumber = ?
+                        `;
+
+                        db.query(clearIdSql, [student_id], (err, clearResult) => {
+                            if (err) {
+                                console.error("Query Error (clearIdSql):", err);
+                                return res.json({ success: false, message: "Database error" });
+                            }
+
+                            // Decrement all higher IDs
+                            const decrementIdsSql = `
+                                UPDATE db_attendance.tbl_attendancestatus
+                                SET ID = ID - 1
+                                WHERE ID > ?
+                            `;
+
+                            db.query(decrementIdsSql, [currentId], (err, decrementResult) => {
+                                if (err) {
+                                    console.error("Query Error (decrementIdsSql):", err);
+                                    return res.json({ success: false, message: "Database error" });
+                                }
+
+                                res.json({ success: true, message: "Entry removed and IDs updated" });
+                            });
+                        });
                     });
-                });
+                } else {
+                    res.json({ success: false, message: "No entry found to clear" });
+                }
             });
         } else {
-            res.json({ success: false, message: "No entry found to clear" });
+            // Has time-in value, so just return success without changing database
+            res.json({ success: true, message: "Input cleared" });
         }
     });
 });

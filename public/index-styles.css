@@ -221,12 +221,9 @@ button {
   content: '➡';
   margin-left: 5px;
 }
-#player-number{
-  color: green
-}
 #student-timein{
-  color: lime;
+  color: green;
 }
-#student-timeout{
-  color: red;
+#student-timeout, #student-name, #student-course, #player-number{
+  color: rgb(117, 2, 2);
 }
