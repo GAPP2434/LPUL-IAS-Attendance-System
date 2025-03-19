@@ -461,7 +461,7 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                     from: process.env.EMAIL_USER,
                     to: demail,
                     subject: "Certificate of Participation to the Seminar entitled “Squid Game: Cyber Edition – Don’t Let Your Data Get Eliminated”",
-                    text: `Dear ${dname},\n\nThank you for participating in today's seminar. Don't forget to answer the feedback form if you haven't already. Here is your attendance certificate and thank you again for your participation.
+                    text: `Dear ${dname},\n\nThank you for participating in today's seminar. Attached herewith this email is the certificate of your participation. Please answer the feedback form in the link below.
                     \nFeedback Form Link:\nhttps://forms.office.com/r/XM3YQZ9qYP\n\nBest regards,\nIAS Seminar Team`,
                     attachments: [
                         {
