@@ -432,16 +432,12 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                 // Load and embed the custom font
                 const fontBytes = fs.readFileSync(path.join(__dirname, 'public/fonts/Tempting.ttf'));
                 const customFont = await newPdfDoc.embedFont(fontBytes);
-    
+                
+                let displayName = dname;
+
                 const pages = newPdfDoc.getPages();
                 const firstPage = pages[0];
                 const { width, height } = firstPage.getSize();
-    
-                // Fix specific name issue
-                let displayName = dname;
-                if (dname === "Gabriel Dominic K. Altea") {
-                    displayName = "Gabriel Dominic K. Altea";
-                }
     
                 // Updated font size to 40 and recalculated center position
                 const fontSize = 40;
@@ -458,17 +454,18 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                 });
 
                 const newPdfBytes = await newPdfDoc.save();
-                const newPdfPath = `uploads/${dstudentnumber}.pdf`;
+                const newPdfPath = `uploads/${dname}-Certificate_Of_Participation.pdf`;
                 fs.writeFileSync(newPdfPath, newPdfBytes);
 
                 const mailOptions = {
                     from: process.env.EMAIL_USER,
                     to: demail,
                     subject: "Certificate of Participation to the Seminar entitled “Squid Game: Cyber Edition – Don’t Let Your Data Get Eliminated”",
-                    text: `Dear ${dname},\n\nThank you for participating in todays seminar. Don't forget to answer the feedback form if you haven't already. Here is your attendance certificate and thank you again for your participation.\n\nBest regards,\nIAS Seminar Team`,
+                    text: `Dear ${dname},\n\nThank you for participating in today's seminar. Don't forget to answer the feedback form if you haven't already. Here is your attendance certificate and thank you again for your participation.
+                    \nFeedback Form Link:\nhttps://forms.office.com/r/XM3YQZ9qYP\n\nBest regards,\nIAS Seminar Team`,
                     attachments: [
                         {
-                            filename: `${dstudentnumber}.pdf`,
+                            filename: `${dname}-Certificate_Of_Participation.pdf`,
                             path: newPdfPath
                         }
                     ]
