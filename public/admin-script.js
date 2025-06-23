@@ -10,12 +10,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const searchTerm = this.value.toLowerCase();
         filterTableBySearch(searchTerm, selectedCourse, selectedYear, selectedStatus);
     });
-    // Fetch logs on page load
-    fetch("http://localhost:5000/fetch_logs")
+
+    // Function to fetch and update logs
+    function fetchAndUpdateLogs() {
+        fetch("http://localhost:5000/fetch_logs")
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 const tableBody = document.getElementById("log-table-body");
+                // Clear existing rows
+                tableBody.innerHTML = '';
+                
                 data.logs.forEach(log => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
@@ -31,6 +36,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     `;
                     tableBody.appendChild(row);
                 });
+
+                // Update total count after refresh
+                updateTotalCount();
+                
+                // Apply current filters after refresh
+                if (selectedCourse || selectedYear || selectedStatus) {
+                    filterTable(selectedCourse, selectedYear, selectedStatus);
+                }
 
                 // Add event listeners for course filter options
                 document.querySelectorAll(".course-option").forEach(option => {
@@ -67,13 +80,49 @@ document.addEventListener("DOMContentLoaded", () => {
                     exportTableToExcel("log-table-body", selectedCourse, selectedYear, selectedStatus);
                 });
 
-                // Initial count update
-                updateTotalCount();
             } else {
                 alert("Failed to fetch logs");
             }
         })
         .catch(error => console.error("Error:", error));
+    }
+
+    // Initial load
+    fetchAndUpdateLogs();
+    
+    // Auto-refresh every 5 seconds to show live updates
+    setInterval(fetchAndUpdateLogs, 5000);
+    
+    // Add manual refresh button functionality
+    function addRefreshButton() {
+        const refreshBtn = document.createElement('button');
+        refreshBtn.innerHTML = '🔄 Refresh';
+        refreshBtn.style.cssText = `
+            margin-left: 10px;
+            padding: 8px 12px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        `;
+        refreshBtn.onclick = () => {
+            refreshBtn.innerHTML = '🔄 Refreshing...';
+            fetchAndUpdateLogs();
+            setTimeout(() => {
+                refreshBtn.innerHTML = '🔄 Refresh';
+            }, 1000);
+        };
+        
+        const actionButtons = document.querySelector('.action-buttons');
+        if (actionButtons) {
+            actionButtons.insertBefore(refreshBtn, actionButtons.firstChild);
+        }
+    }
+    
+    // Add refresh button after initial load
+    setTimeout(addRefreshButton, 1000);
 
 function getPasswordInput(message, callback) {
 

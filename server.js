@@ -219,33 +219,74 @@ function handleTimeAction(req, res, action) {
     const { student_id } = req.body;
     const isTimeIn = action === 'in';
     
-    const sql = `
-        SET time_zone = '+08:00';
-        UPDATE db_attendance.tbl_logs
-        SET ${isTimeIn ? 'ttimein' : 'ttimeout'} = NOW()
-        WHERE dstudentnumber = ? 
-        ${isTimeIn ? '' : 'AND ttimein IS NOT NULL AND ttimeout IS NULL'}
-        ORDER BY dlogid DESC LIMIT 1;
-
-        UPDATE db_attendance.tbl_attendancestatus
-        SET dattendancestatus = ?
-        WHERE dstudentnumber = ?;
-    `;
-
-    db.query(sql, [
-        student_id, 
-        isTimeIn ? 'ONGOING' : 'ATTENDED',
-        student_id
-    ], (err, result) => {
+    // Set timezone first
+    db.query("SET time_zone = '+08:00'", (err) => {
         if (err) {
-            console.error(`Query Error (time_${action}):`, err);
+            console.error("Error setting timezone:", err);
             return res.json({ success: false, message: "Database error" });
         }
-        res.json({ 
-            success: true, 
-            message: `Time ${action} recorded and status updated to ${isTimeIn ? 'ONGOING' : 'ATTENDED'}` 
-        });
-    });
+
+        // First get the latest log entry ID for this student
+        const getLatestLogSql = `
+            SELECT dlogid FROM db_attendance.tbl_logs 
+            WHERE dstudentnumber = ? 
+            ORDER BY dlogid DESC LIMIT 1
+        `;
+
+        db.query(getLatestLogSql, [student_id], (err, logIdResult) => {
+            if (err) {
+                console.error(`Query Error (get latest log time_${action}):`, err);
+                return res.json({ success: false, message: "Database error" });
+            }
+
+            if (logIdResult.length === 0) {
+                console.error(`No log entry found for student ${student_id}`);
+                return res.json({ success: false, message: "No log entry found for this student" });
+            }
+
+            const logId = logIdResult[0].dlogid;
+
+            // Update the specific log entry with time in/out
+            const logUpdateSql = `
+                UPDATE db_attendance.tbl_logs
+                SET ${isTimeIn ? 'ttimein' : 'ttimeout'} = NOW()
+                WHERE dlogid = ? 
+                ${isTimeIn ? '' : 'AND ttimein IS NOT NULL AND ttimeout IS NULL'}
+            `;
+
+                         db.query(logUpdateSql, [logId], (err, logResult) => {
+                 if (err) {
+                     console.error(`Query Error (log update time_${action}):`, err);
+                     return res.json({ success: false, message: "Database error" });
+                 }
+
+                 // Check if any rows were affected
+                 if (logResult.affectedRows === 0) {
+                     console.error(`No log entry found for student ${student_id}`);
+                     return res.json({ success: false, message: "No log entry found for this student" });
+                 }
+
+                 // Update the attendance status
+                 const statusUpdateSql = `
+                     UPDATE db_attendance.tbl_attendancestatus
+                     SET dattendancestatus = ?
+                     WHERE dstudentnumber = ?
+                 `;
+
+                 db.query(statusUpdateSql, [isTimeIn ? 'ONGOING' : 'ATTENDED', student_id], (err, statusResult) => {
+                     if (err) {
+                         console.error(`Query Error (status update time_${action}):`, err);
+                         return res.json({ success: false, message: "Database error" });
+                     }
+
+                     res.json({ 
+                         success: true, 
+                         message: `Time ${action} recorded and status updated to ${isTimeIn ? 'ONGOING' : 'ATTENDED'}` 
+                     });
+                 });
+             });
+         });
+     });
 }
 
 app.post("/time_in", (req, res) => handleTimeAction(req, res, 'in'));
