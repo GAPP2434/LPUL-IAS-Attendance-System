@@ -64,7 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Update student info display
                 document.getElementById("student-name").textContent = data.name;
                 document.getElementById("student-course").textContent = `${data.course} - ${data.year_level || "-"}`;
-                document.getElementById("player-number").textContent = String(data.attendance_id).padStart(3, '0');
+                document.getElementById("player-number").textContent = studentId;
+                // document.getElementById("player-number").textContent = String(data.attendance_id).padStart(3, '0');
                 
                 // Check current attendance status to determine action
                 fetch("http://localhost:5000/check_attendance_status", {

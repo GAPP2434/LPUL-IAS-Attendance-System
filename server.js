@@ -501,9 +501,9 @@ app.post("/upload_pdf", upload.single("pdf"), async (req, res) => {
                 const mailOptions = {
                     from: process.env.EMAIL_USER,
                     to: demail,
-                    subject: "Certificate of Participation to the Seminar entitled “Squid Game: Cyber Edition – Don’t Let Your Data Get Eliminated”",
-                    text: `Dear ${dname},\n\nThank you for participating in today's seminar. Attached herewith this email is the certificate of your participation. Please answer the feedback form in the link below.
-                    \nFeedback Form Link:\nhttps://forms.office.com/r/XM3YQZ9qYP\n\nBest regards,\nIAS Seminar Team`,
+                    subject: "Certificate of Participation – Kuya’s House Gets Smart: Living with AI",
+                    text: `Dear ${dname},\n\nThank you for attending the seminar “Kuya’s House Gets Smart: Living with AI” held on June 27, 2025, at the Drawing Lab, PHL Building. We hope you found the session and mini hackathon with Mr. Ronnel Robles insightful and engaging. \n\nPlease find your Certificate of Participation attached.
+                    \nWe'd also appreciate your feedback:\nhttps://forms.gle/9dW7q2sfgSYiKcgi8\n\nBest regards,\nBSCS 3-1 & BSIT 3-1\nCollege of Engineering and Computer Studies\nLyceum of the Philippines University – Laguna`,
                     attachments: [
                         {
                             filename: `${dname}-Certificate_Of_Participation.pdf`,
