@@ -1,229 +1,241 @@
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', sans-serif;
-}
-body {
-  background-image: url('images/background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-.container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 90%;
-  max-width: 1400px;
-}
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-/* Wrapper for title and input box */
-.input-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+        body {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            background-image: url("images/backgroundpb.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: 'Inter', sans-serif;
+        }
 
-/* Title */
-.title {
-  color: white;
-  font-size: 28px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-}
+        .admin-link {
+            z-index: 10;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #1f2937;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
 
-.title span{
-  font-family: 'Orbitron', sans-serif;
-  font-size: 35px;
-}
-@font-face{
-  font-family: 'Symphony-Regular';
-  src: url('fonts/Symphony-Regular.ttf') format('truetype'); /* Correct the src URL */
-}
+        .admin-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
 
-/* Left Box (Input Section) */
-.input-box {
-  background: #05726e;
-  padding: 30px;
-  border-radius: 10px;
-  width: 520px;
-  text-align: center;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-  border: 10px solid black;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-.input-box img {
-  width: 230px;
-  height: 230px;
-  display: block;
-  margin: 0 auto 15px;
-}
-.input-box p {
-  color: white;
-  margin-bottom: 8px;
-}
-.input-box input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  border: none;
-  margin-bottom: 15px;
-}
+        .container {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
 
-.time-buttons {
-  display: flex;
-  gap: 10px;
-  width: 100%;  
-  justify-content: center;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  text-transform: uppercase;
-}
-
-#submit-btn {
-  background: linear-gradient(45deg, #0088cc, #005f99);
-  color: white;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-#submit-btn:hover {
-  background: linear-gradient(45deg, #00aaff, #0077cc);
-  transform: scale(1.05);
-}
-
-#time-in-btn {
-  background: linear-gradient(45deg, #4CAF50, #2E7D32);
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-#time-in-btn:hover {
-  background: linear-gradient(45deg, #66bb6a, #388E3C);
-  transform: scale(1.05);
-}
-
-#time-out-btn {
-  background: linear-gradient(45deg, #D32F2F, #B71C1C);
-  color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-#time-out-btn:hover {
-  background: linear-gradient(45deg, #E53935, #C62828);
-  transform: scale(1.05);
-}
-
-#clear-entry {
-  background: linear-gradient(45deg, #f0f0f0, #d9d9d9); /* Light Gray Gradient */
-  color: #333; /* Dark gray text for readability */
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease-in-out;
-}
-
-#clear-entry:hover {
-  background: linear-gradient(45deg, #cfd8dc, #b0bec5); /* Subtle Blue-Gray Gradient */
-  color: #000; /* Keep text visible */
-  transform: scale(1.05);
-}
-
-#clear-entry:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+        .input-wrapper {
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
 
 
 
-.hidden {
-  display: none;
-}
+        .input-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
 
-/* Right Box (Diamond Player Info) */
-.player-info {
-  background-color: #C296A6;
-  width: 590px;
-  height: 590px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  transform: rotate(45deg);
-  color: black;
-  font-weight: bold;
-  box-shadow:
-  inset 5px 5px 100px rgba(0, 0, 0, 0.4), 
-  inset -5px -5px 100px rgba(0, 0, 0, 0.4),
-  0px 4px 10px rgba(0, 0, 0, 0.5);
-}
+        .left-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
 
-.player-info div {
-  transform: rotate(-45deg);
-}
+        .left-logo img {
+             width: 300px !important;
+			 height: auto !important;
+        }
 
-.player-info span {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 120px;
-  text-shadow: 0 0 1px #996174, 0 0 10px #996174;
-}
+        .input-box h1 {
+            color: #1f2937;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
 
-.player-info p {
-  margin-top: 15px;
-  font-size: 24px;
-}
+        .input-box .subtitle {
+            color: #2563eb;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
 
-.player-info label {
-  font-size: 20px;
-}
+        .input-box img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 1rem;
+        }
 
-.player-number {
-  font-family: 'Digital Numbers', sans-serif;
-  font-size: 48px;
-  margin: 10px 0;
-  transform: rotate(-90deg);
-}
+        .input-box p {
+            color: #1f2937;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
 
-/* Admin Page Link */
-.admin-link {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  color: white;
-  text-decoration: none;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-}
-.admin-link::after {
-  content: '➡';
-  margin-left: 5px;
-}
-#student-timein{
-  color: green;
-}
-#student-timeout, #student-name, #student-course, #player-number{
-  color: rgb(117, 2, 2);
-}
+        .input-box input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #d1d5db;
+            color: #1f2937;
+            font-size: 1.125rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            padding: 0 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-box input::placeholder {
+            color: #6b7280;
+        }
+
+        .input-box button {
+            width: 100%;
+            background: #1d4ed8;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem;
+            font-size: 1.25rem;
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-box button:hover {
+            background: #1e3a8a;
+            transform: scale(1.05);
+        }
+
+
+
+        .player-info {
+            width: 60%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            padding-top: 200px;
+        }
+
+        .player-info > div {
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .info-background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1000px;
+            height: auto;
+            max-width: none;
+            opacity: 0.9;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .player-info p {
+            color: #ca8a04;
+            font-size: 1.125rem;
+            font-weight: bold;
+            margin: 1rem 0 0.5rem 0;
+        }
+
+        .player-info p:first-child {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ca8a04;
+            margin-bottom: 0.5rem;
+        }
+
+        .player-info label,
+        .player-info span {
+            color: #1e40af;
+            font-size: 1.25rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        #player-number {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .time-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-top: 0rem;
+            border-top: 4px solid #dc2626;
+            margin-top: 0.5rem;
+        }
+
+        .time-in,
+        .time-out {
+            text-align: center;
+            flex: 1;
+        }
+
+        .time-in p {
+            color: #059669;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .time-out p {
+            color: #dc2626;
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .time-in label {
+            color: #047857;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .time-out label {
+            color: #b91c1c;
+            font-size: 1.125rem;
+            font-weight: 600;
+        }

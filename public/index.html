@@ -22,42 +22,57 @@
     <a href="admin.html" class="admin-link">Admin Page</a>
 
     <div class="container">
+
         <div class="input-wrapper">
-            <div class="title">
-                <span>Squid Game: Cyber Edition –</span><br>
-                <span>Don’t Let Your Data Get</span><br>
-                <span>Eliminated</span>
+        <div class="input-box">
+            <div class="left-logo">
+                <img src="images/logo.png" alt="Logo" />
             </div>
+            <h1>ATTENDANCE SYSTEM</h1>
+            <div class="subtitle">HOUSEMATE CHECK-IN</div>
 
-            <div class="input-box">
-                <img src="images/smile.png" alt="User Image">
-                <p>Student Number:</p>
-                <input type="text" id="student-id" placeholder="Enter your student number"  pattern="[0-9\-]*">
-                <button id="submit-btn">Submit</button>
+            <p>STUDENT NUMBER:</p>
+            <input type="text" id="student-id" placeholder="Enter your student number" pattern="[0-9\-]*">
 
-                <div class="time-buttons">
-                    <button id="clear-entry" class="hidden">Clear Entry</button>
-                    <button id="time-in-btn" class="hidden">Time In</button>
-                    <button id="time-out-btn" class="hidden">Time Out</button>
-                </div>
+            <!-- Keep these buttons with their original IDs -->
+            <button id="submit-btn">SUBMIT</button>
 
+            <div class="time-buttons">
+                <button id="clear-entry" class="hidden">Clear Entry</button>
+                <button id="time-in-btn" class="hidden">Time In</button>
+                <button id="time-out-btn" class="hidden">Time Out</button>
             </div>
         </div>
+    </div>
 
-        <div class="player-info">
-            <div>
-                <p>Player Number:</p>
-                <span id="player-number">000</span>
-                <p>Name:</p>
-                <label id="student-name">-</label>
-                <p>Student Course/Year/Section:</p>
-                <label id="student-course">-</label>
-                <p>Time-in:</p>
+
+    <div class="player-info">
+    <!-- Background transparent image -->
+    <img src="images/houseimage.png" style="width: 750px; height: auto;" alt="Student Info Background" class="info-background">
+
+    <div>
+        <p>Group Number:</p>
+        <span id="player-number">000</span>
+
+        <p>Name:</p>
+        <label id="student-name">-</label>
+
+        <p>Student Course/Year/Section:</p>
+        <label id="student-course">-</label>
+
+        <div class="time-section">
+            <div class="time-in">
+                <p>TIME-IN:</p>
                 <label id="student-timein">-</label>
-                <p>Time-out:</p>
+            </div>
+
+            <div class="time-out">
+                <p>TIME-OUT:</p>
                 <label id="student-timeout">-</label>
             </div>
         </div>
     </div>
+</div>
+
 </body>
 </html>
